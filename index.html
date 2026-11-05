@@ -115,6 +115,9 @@ input::placeholder,textarea::placeholder{color:#7c8a83}
 .mini-note{font-weight:400;font-size:12px}
 .mini-head{display:grid;margin-top:1px}
 .mini-head span{font-size:12px;color:var(--brand-d);font-weight:600;overflow:hidden;white-space:nowrap}
+.mini-ticks{display:grid;margin-top:1px}
+.mini-ticks:empty{display:none}
+.mini-ticks span{font-size:11px;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
 .phase-bar{display:flex;align-items:baseline;gap:8px;padding:8px 20px;background:var(--brand-softer);border-bottom:1px solid var(--line);color:var(--brand-d);font-weight:700;font-size:14px}
 .phase-bar small{font-weight:600;color:#55806a;font-size:12px;letter-spacing:.03em}
 .plan-row{padding-top:9px;padding-bottom:9px;border-bottom:1px solid var(--line);transition:background .12s}
@@ -428,7 +431,7 @@ input::placeholder,textarea::placeholder{color:#7c8a83}
       <div class="card plan">
         <div class="plan-head">
           <span></span><span>กิจกรรม</span><span>สถานะ</span><span>วันเริ่มต้น – สิ้นสุด</span>
-          <div class="mini-labels"><div class="mini-note" id="miniNote"></div><div class="mini-head" id="miniHead"></div></div>
+          <div class="mini-labels"><div class="mini-note" id="miniNote"></div><div class="mini-head" id="miniHead"></div><div class="mini-ticks" id="miniTicks"></div></div>
         </div>
         <div id="schedule"></div>
       </div>
@@ -480,7 +483,7 @@ input::placeholder,textarea::placeholder{color:#7c8a83}
 
   var STORAGE_KEY = 'gcc-master-plan-cfo';
   var SCHEMA = 'gcc-master-plan-cfo';
-  var MIN_MONTHS = 5, MAX_MONTHS = 12;
+  var MIN_MONTHS = 1, MAX_MONTHS = 12;
   var LOGO = document.querySelector('.brand img').getAttribute('src');
   var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var STATUSES = ['Planned','In Progress','Done'];
@@ -643,8 +646,8 @@ input::placeholder,textarea::placeholder{color:#7c8a83}
   }
   function ganttHtml() {
     var tl = timeline(), n = tl.months * 4;
-    var wide = tl.months > MIN_MONTHS;
-    var actW = wide ? 246 : 268.5, weeksW = 780 - 24 - actW - 51.5 - 57.5, colW = weeksW / n;
+    /* Up to 5 months keep the standard column width and the activity column takes the rest; longer plans narrow the columns. */
+    var weeksW = tl.months > 5 ? 401 : n * 18.925, actW = 780 - 24 - 51.5 - 57.5 - weeksW, colW = weeksW / n;
     var wkPt = clamp(colW * 0.34, 4.4, 6.5), numPt = clamp(colW * 0.4, 4.8, 7.6);
     var h = '<table class="gantt"><colgroup><col style="width:24pt"><col style="width:' + actW + 'pt"><col style="width:51.5pt"><col style="width:57.5pt">';
     for (var c = 0; c < n; c++) h += '<col style="width:' + colW.toFixed(3) + 'pt">';
@@ -912,6 +915,12 @@ input::placeholder,textarea::placeholder{color:#7c8a83}
     $('miniHead').innerHTML = h;
     $('miniHead').style.gridTemplateColumns = 'repeat(' + tl.months + ',minmax(0,1fr))';
     $('miniNote').textContent = '1 ช่อง = 7 วัน นับจาก ' + tl.baseLabel;
+    var ticks = '';
+    if (tl.months <= 3) {
+      for (var c = 0; c < n; c++) ticks += '<span>' + new Date((tl.baseDay + c * 7) * 86400000).getUTCDate() + '</span>';
+    }
+    $('miniTicks').innerHTML = ticks;
+    $('miniTicks').style.gridTemplateColumns = 'repeat(' + n + ',minmax(0,1fr))';
     ALL.forEach(function (it) {
       var id = it[0], box = $('mini-' + id), bar = box.firstChild, a = state.activities[id], sp = span(a);
       box.style.setProperty('--n', n);
