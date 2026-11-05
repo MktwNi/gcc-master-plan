@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Project Master Plan — แบบกรอกแผนการทวนสอบ CFO</title>
+<style>
+:root{
+  color-scheme:light;
+  --green:#3f5f4a; --green-2:#5a7a64; --green-soft:#eef5f3;
+  --ink:#27312b; --muted:#5f6c65; --line:#d5ded8; --bg:#f2f4f2; --card:#fff;
+  --danger:#b3261e; --danger-soft:#fbeeed; --warn:#7a5200; --warn-soft:#fdf5e3; --ok:#1f6b3a; --ok-soft:#e8f4ec;
+  --font:Tahoma,"Leelawadee UI","Noto Sans Thai","Sarabun",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+
+/* ---------- Top bar ---------- */
+.topbar{position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:10px 20px;background:var(--card);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px;margin-right:auto;min-width:0}
+.brand img{width:44px;height:auto;display:block}
+.brand strong{display:block;color:var(--green);font-size:16px;line-height:1.25}
+.brand span{display:block;color:var(--muted);font-size:12.5px}
+.save-state{color:var(--muted);font-size:12.5px}
+.save-state.bad{color:var(--danger)}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{min-height:38px;padding:7px 14px;border:1px solid #b9c6bd;border-radius:6px;background:#fff;cursor:pointer}
+.btn:hover{background:var(--green-soft)}
+.btn.primary{background:var(--green);border-color:var(--green);color:#fff;font-weight:bold}
+.btn.primary:hover{background:#34503e}
+
+/* ---------- Layout ---------- */
+.layout{display:grid;grid-template-columns:660px minmax(0,1fr);gap:20px;padding:20px;align-items:start}
+.form-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+.card h2{margin:0 0 4px;color:var(--green);font-size:15px}
+.card .hint{margin:0 0 12px;color:var(--muted);font-size:12.5px}
+.preview-col{position:sticky;top:78px;max-height:calc(100vh - 98px);overflow:auto;min-width:0}
+.preview-head{display:flex;flex-wrap:wrap;gap:2px 12px;align-items:baseline;margin-bottom:8px}
+.preview-head strong{color:var(--green)}
+.preview-head span{color:var(--muted);font-size:12.5px}
+#stage{position:relative;overflow:hidden}
+#sheets{width:297mm;transform-origin:0 0}
+#sheets .sheet{box-shadow:0 1px 4px rgba(39,49,43,.28);margin-bottom:14px}
+
+/* ---------- Status panel ---------- */
+.checks{border-radius:8px;padding:12px 16px;border:1px solid var(--line);background:var(--card);font-size:13px}
+.checks .count{font-weight:bold;color:var(--green)}
+.checks .group{margin-top:8px;padding:8px 10px;border-radius:6px}
+.checks .group.err{background:var(--danger-soft);color:var(--danger)}
+.checks .group.warn{background:var(--warn-soft);color:var(--warn)}
+.checks .group.ok{background:var(--ok-soft);color:var(--ok)}
+.checks .group b{display:block;margin-bottom:2px}
+.checks ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:2px 12px}
+.checks li button{padding:2px 0;border:0;background:none;color:inherit;cursor:pointer;text-decoration:underline;text-align:left}
+
+/* ---------- Form ---------- */
+.fields{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px 12px}
+.f{display:flex;flex-direction:column;gap:3px;min-width:0}
+.f>label,.f>.lbl{font-size:12.5px;color:var(--muted)}
+.f .opt{color:#7d8a83}
+.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:span 6}
+input[type=text],input[type=date],select,textarea{width:100%;min-height:36px;padding:6px 8px;border:1px solid #b9c6bd;border-radius:5px;background:#fff}
+textarea{resize:vertical;min-height:54px}
+[aria-invalid=true]{border-color:var(--danger);background:var(--danger-soft)}
+.radios{display:flex;gap:16px;min-height:36px;align-items:center}
+.radios label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.sched-head,.sched-row{display:grid;grid-template-columns:24px minmax(0,1fr) 104px 130px 130px;gap:8px;align-items:center}
+.sched-head{padding:0 0 6px;color:var(--muted);font-size:12.5px;border-bottom:2px solid var(--green)}
+.phase-title{margin:12px 0 0;padding:4px 8px;background:#e9eeea;border-radius:4px;color:var(--green);font-size:13px;font-weight:bold}
+.phase-title small{color:#6e8c78;font-size:12px;margin-right:6px}
+.sched-row{padding:7px 0;border-bottom:1px solid #e7ede9}
+.sched-row .n{color:#6b7871;font-weight:bold;text-align:center}
+.sched-row .act{font-size:13px;line-height:1.35;min-width:0}
+.tag{display:inline-block;margin-top:2px;padding:0 6px;border-radius:3px;font-size:11px;font-weight:bold;line-height:17px}
+.tag.Client{background:#8c9a92;color:#fff}.tag.GCC{background:var(--green);color:#fff}.tag.Both{background:#dce3de;color:#35543f}
+.row-err{grid-column:2/-1;color:var(--danger);font-size:12.5px}
+.row-err:empty{display:none}
+.mobile-lbl{display:none;font-size:12px;color:var(--muted)}
+
+@media (max-width:1240px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .preview-col{position:static;max-height:none}
+}
+@media (max-width:720px){
+  .topbar{padding:10px 16px}
+  .layout{padding:16px}
+  .fields{grid-template-columns:minmax(0,1fr)}
+  .c2,.c3,.c4,.c6{grid-column:auto}
+  .sched-head{display:none}
+  .sched-row{grid-template-columns:26px minmax(0,1fr)}
+  .sched-row .ctl{grid-column:2}
+  .mobile-lbl{display:block}
+}
+
+/* ---------- Document sheet (matches the original Master Plan, A4 landscape) ---------- */
+.sheet{position:relative;width:297mm;height:210mm;overflow:hidden;background:#fff;color:#3a423e;font-family:Tahoma,"Leelawadee UI","Noto Sans Thai",sans-serif;font-size:7pt;line-height:1.2;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.run-head{position:absolute;top:17pt;right:31pt;font-size:6.5pt;color:#77837d;white-space:nowrap}
+.run-head b{color:#3f5f4a;margin-right:6pt}
+.run-head i{font-style:normal;margin-right:6pt}
+.run-foot{position:absolute;left:31pt;right:31pt;bottom:11pt;padding-top:5pt;border-top:.5pt solid #e7ede9;text-align:center;font-size:6pt;color:#77837d}
+.logo{position:absolute;left:33pt;top:26.85pt;width:58.5pt;height:48.75pt}
+.head-rule{position:absolute;left:121.5pt;top:25pt;width:.75pt;height:52.5pt;background:#3a423e}
+.head-txt{position:absolute;left:126.7pt;top:33pt}
+.head-txt h1{margin:0;font-size:15pt;line-height:18pt;color:#3f5f4a;font-weight:bold}
+.head-txt p{margin:0;font-size:8pt;line-height:9.5pt;color:#77837d}
+.head-txt p+p{font-size:7pt;line-height:9pt;color:#6e8c78;font-weight:bold}
+.band{position:absolute;left:31pt;top:88pt;width:780pt;height:8.5pt;background:linear-gradient(90deg,#3f5f4a 0,#3f5f4a 66.67%,#a7b5ac 66.67%,#a7b5ac 100%)}
+.content{position:absolute;left:31pt;top:109pt;width:780pt;bottom:30pt;overflow:hidden}
+.info{width:780pt;border-collapse:collapse;table-layout:fixed;border-top:1pt solid #3f5f4a;border-bottom:1pt solid #3f5f4a}
+.info td{padding:2.2pt 6pt;border:.4pt solid #3a423e;vertical-align:middle;word-break:break-word;white-space:pre-line}
+.info tr:first-child td{border-top:0}.info tr:last-child td{border-bottom:0}
+.info td:first-child{border-left:0}.info td:last-child{border-right:0}
+.info td.k{background:#eef5f3;color:#3f5f4a;font-weight:bold;white-space:nowrap}
+.info u{text-underline-offset:1.2pt}
+.gantt{width:780pt;margin-top:14pt;border-collapse:collapse;table-layout:fixed;border:1pt solid #3f5f4a}
+.gantt th,.gantt td{padding:0;border:.4pt solid #3a423e;text-align:center;vertical-align:middle;white-space:nowrap;overflow:hidden}
+.gantt thead th{background:#3f5f4a;color:#fff;font-weight:bold;font-size:7.6pt}
+.gantt thead th.left{text-align:left;padding-left:6.5pt;font-size:8pt}
+.gantt thead tr:first-child{height:15.4pt}
+.gantt thead tr:last-child{height:12.4pt}
+.gantt thead th.wk{background:#5a7a64}
+.gantt tr.phase{height:12.3pt}
+.gantt tr.phase td{background:#e9eeea;text-align:left;padding-left:7pt;font-weight:bold;font-size:7.6pt;color:#3f5f4a}
+.gantt tr.phase td span{color:#6e8c78}
+.gantt tr.phase td i{font-style:normal;color:#6e8c78;margin:0 5pt}
+.gantt tr.act{height:14pt;font-size:7.6pt}
+.gantt tr.act.even td{background:#f7f9f8}
+.gantt td.no{font-weight:bold;font-size:7pt;color:#77837d}
+.gantt td.name{text-align:left;padding-left:6.5pt}
+.gantt td.b{font-weight:bold;font-size:6.5pt}
+.gantt tr.act td.r-Client{background:#8c9a92;color:#fff}
+.gantt tr.act td.r-GCC{background:#3f5f4a;color:#fff}
+.gantt tr.act td.r-Both{background:#dce3de;color:#35543f}
+.gantt tr.act td.s-Done{background:#9fb8a6;color:#fff}
+.gantt tr.act td.s-InProgress{background:#d3dfd6;color:#35543f}
+.gantt tr.act td.s-Planned{background:#f0f2f0;color:#77837d}
+.gantt tr.act td.on{background:#00b050;color:#0f2a1a;line-height:1}
+.legend{margin-top:15pt}
+.legend h3{margin:0 0 4pt;font-size:8pt;color:#3f5f4a}
+.legend div{display:grid;grid-template-columns:repeat(5,1fr)}
+.legend span{display:flex;align-items:center;gap:6pt;color:#5f6c65}
+.legend i{display:block;width:14.5pt;height:14pt}
+.remark{margin:7pt 0 0;font-size:7pt;line-height:1.45;color:#3a423e}
+.remark b{color:#3f5f4a}
+.sheet.tight .gantt{margin-top:9pt}
+.sheet.tight .gantt tr.act{height:12.6pt}
+.sheet.tight .gantt tr.phase{height:11.2pt}
+.sheet.tight .legend{margin-top:9pt}
+.signs{position:absolute;left:31pt;top:30pt;width:780pt;display:grid;grid-template-columns:repeat(3,1fr);border:.6pt solid #cfd6d1}
+.sign{height:88pt;padding-top:7pt;text-align:center;border-left:.6pt solid #3a423e;display:flex;flex-direction:column}
+.sign:first-child{border-left:0}
+.sign h4{margin:0;font-size:8pt;color:#3f5f4a;flex:1}
+.sign p{margin:0;line-height:7.8pt}
+.sign .role{color:#3a423e}
+.sign .org,.sign .date{font-size:6.5pt;color:#77837d}
+.sign .date{padding-bottom:6pt}
+
+/* ---------- Print: only the two sheets, A4 landscape, no browser margins ---------- */
+@page{size:A4 landscape;margin:0}
+@media print{
+  html,body{background:#fff}
+  .ui{display:none!important}
+  .layout{display:block;padding:0}
+  .preview-col{position:static;max-height:none;overflow:visible}
+  #stage{height:auto!important;overflow:visible}
+  #sheets{transform:none!important;width:297mm}
+  #sheets .sheet{box-shadow:none;margin:0;break-after:page;page-break-after:always}
+  #sheets .sheet:last-child{break-after:auto;page-break-after:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar ui">
+  <div class="brand">
+    <img src="data:image/png;base64,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" alt="Global Carbon Corporation">
+    <div><strong>Project Master Plan</strong><span>แบบกรอกแผนการทวนสอบ CFO</span></div>
+  </div>
+  <span id="saveState" class="save-state"></span>
+  <div class="actions">
+    <button type="button" class="btn" id="btnNew">เริ่มแผนใหม่</button>
+    <button type="button" class="btn" id="btnOpen">เปิดไฟล์แผน</button>
+    <button type="button" class="btn" id="btnSave">บันทึกไฟล์แผน</button>
+    <button type="button" class="btn primary" id="btnPdf">ออก PDF</button>
+  </div>
+  <input type="file" id="fileInput" accept=".json,application/json" hidden>
+</header>
+
+<main class="layout">
+  <form class="form-col ui" id="form" autocomplete="off" onsubmit="return false">
+    <div class="checks" id="checks" role="status" aria-live="polite"></div>
+
+    <section class="card">
+      <h2>1. ข้อมูลโครงการ</h2>
+      <p class="hint">ข้อมูลที่กรอกเก็บไว้ในเบราว์เซอร์ของเครื่องนี้เท่านั้น ไม่ถูกส่งขึ้นอินเทอร์เน็ต</p>
+      <div class="fields">
+        <div class="f c4"><label for="f-client">Client — ชื่อลูกค้า</label><input type="text" id="f-client" data-path="project.client"></div>
+        <div class="f c2"><label for="f-code">ชื่อย่อลูกค้า <span class="opt">(ใช้ตั้งชื่อไฟล์)</span></label><input type="text" id="f-code" data-path="project.code" placeholder="เช่น ABC"></div>
+        <div class="f c6"><label for="f-site">Site / Location — ที่ตั้ง</label><textarea id="f-site" data-path="project.site" rows="2"></textarea></div>
+        <div class="f c2"><label for="f-pno">Project No.</label><input type="text" id="f-pno" data-path="project.projectNo" placeholder="เช่น GCC-CFO-XX/2026"></div>
+        <div class="f c2"><label for="f-rev">Revision</label><input type="text" id="f-rev" data-path="project.rev" placeholder="เช่น 0"></div>
+        <div class="f c2"><label for="f-revd">Revision Date</label><input type="date" id="f-revd" data-path="project.revDate"></div>
+        <div class="f c3"><label for="f-pf">Reporting Period — เริ่มต้น</label><input type="date" id="f-pf" data-path="project.periodFrom"></div>
+        <div class="f c3"><label for="f-pt">Reporting Period — สิ้นสุด</label><input type="date" id="f-pt" data-path="project.periodTo"></div>
+        <div class="f c3"><span class="lbl">Level of Assurance</span>
+          <div class="radios">
+            <label><input type="radio" name="assurance" value="Limited" data-path="project.assurance"> Limited</label>
+            <label><input type="radio" name="assurance" value="Reasonable" data-path="project.assurance"> Reasonable</label>
+          </div>
+        </div>
+        <div class="f c3"><label for="f-mat">Materiality</label><input type="text" id="f-mat" data-path="project.materiality"></div>
+        <div class="f c3"><label for="f-std">Standard &amp; Criteria</label><input type="text" id="f-std" data-path="project.standard"></div>
+        <div class="f c3"><label for="f-lv">Lead Verifier</label><input type="text" id="f-lv" data-path="project.leadVerifier"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2. แผนงาน: วันเริ่มต้น – สิ้นสุด</h2>
+      <p class="hint">กรอกปีเป็น ค.ศ. เช่น 2026 · ถ้ากิจกรรมมีวันเดียว ใส่เฉพาะวันเริ่มต้น · แต่ละช่องในตารางคือ 7 วันต่อเนื่อง นับจากวันที่ 1 ของเดือนแรกในแผน วันปลายเดือนจึงอาจอยู่ใต้หัวเดือนถัดไป</p>
+      <div class="sched-head"><span></span><span>กิจกรรม</span><span>สถานะ</span><span>วันเริ่มต้น</span><span>วันสิ้นสุด</span></div>
+      <div id="schedule"></div>
+    </section>
+
+    <section class="card">
+      <h2>3. วันที่ลงนาม</h2>
+      <p class="hint">ปล่อยว่างได้ถ้าจะให้เขียนวันที่ด้วยมือ · ช่องลายเซ็นใน PDF เว้นว่างไว้ให้ผู้ลงนามเซ็นเอง</p>
+      <div class="fields">
+        <div class="f c2"><label for="f-sp">Prepared by (Lead Verifier)</label><input type="date" id="f-sp" data-path="signoff.prepared"></div>
+        <div class="f c2"><label for="f-sa">Approved by (Verification Manager)</label><input type="date" id="f-sa" data-path="signoff.approved"></div>
+        <div class="f c2"><label for="f-sc">Acknowledged by (Client)</label><input type="date" id="f-sc" data-path="signoff.acknowledged"></div>
+      </div>
+    </section>
+  </form>
+
+  <section class="preview-col" aria-label="ตัวอย่างเอกสาร">
+    <div class="preview-head ui">
+      <strong>ตัวอย่าง PDF</strong>
+      <span>กด “ออก PDF” แล้วเลือก Destination เป็น “Save as PDF” (แนะนำ Chrome หรือ Edge)</span>
+    </div>
+    <div id="stage"><div id="sheets"></div></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'gcc-master-plan-cfo';
+  var SCHEMA = 'gcc-master-plan-cfo';
+  var MIN_MONTHS = 5, MAX_MONTHS = 12;
+  var LOGO = document.querySelector('.brand img').getAttribute('src');
+  var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var STATUSES = ['Planned','In Progress','Done'];
+  var PHASES = [
+    { name:'Engagement & Agreement', items:[
+      [1,'Application form / questionnaire received and initial screening','Client'],
+      [2,'Proposal preparation and submission to client','GCC'],
+      [3,'Signed proposal / agreement returned by authorised person','Client'],
+      [4,'Impartiality review, appointment of verification team','GCC'] ]},
+    { name:'Planning & Desk Review', items:[
+      [5,'Submission of CFO report, V-sheets (Fr-01 – Fr-05) and evidence','Client'],
+      [6,'Desk review — boundary, completeness, EF and calculation check','GCC'],
+      [7,'Risk analysis (IR × CR × DR), materiality and sampling plan','GCC'],
+      [8,'Verification plan and audit agenda issued to client','GCC'] ]},
+    { name:'Verification & Findings', items:[
+      [9,'Opening meeting, on-site / remote verification, evidence sampling','Both'],
+      [10,'Closing meeting and issue of findings (CAR / CL / OFI)','GCC'],
+      [11,'Client response and submission of corrective evidence','Client'],
+      [12,'Review, verification and closure of all findings','GCC'] ]},
+    { name:'Reporting, Review & Issuance', items:[
+      [13,'Draft verification report and verification statement','GCC'],
+      [14,'Independent technical review by internal reviewer','GCC'],
+      [15,'Final approval and issuance of verification statement','GCC'],
+      [16,'Submission of final package to client / support TGO registration','Both'] ]}
+  ];
+  var ALL = [];
+  PHASES.forEach(function (p) { p.items.forEach(function (i) { ALL.push(i); }); });
+
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $('form'), sheets = $('sheets'), stage = $('stage'), checksEl = $('checks'), saveEl = $('saveState');
+  var state, dirty = false;
+
+  /* ---------- State ---------- */
+  function blank() {
+    var a = {};
+    ALL.forEach(function (i) { a[i[0]] = { status:'Planned', start:'', end:'' }; });
+    return {
+      schema: SCHEMA, version: 1,
+      project: { client:'', code:'', projectNo:'', rev:'0', revDate:'', site:'', periodFrom:'', periodTo:'',
+                 assurance:'Limited', standard:'TGO CFO Guideline', leadVerifier:'', materiality:'5% of total emissions' },
+      activities: a,
+      signoff: { prepared:'', approved:'', acknowledged:'' }
+    };
+  }
+  function str(v) { return typeof v === 'string' ? v : (typeof v === 'number' ? String(v) : ''); }
+  function isoStr(v) { return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : ''; }
+  /* Accept only known fields, so a hand-edited or foreign file cannot corrupt the page. */
+  function normalize(raw) {
+    var s = blank(), r = raw || {}, p = r.project || {}, sg = r.signoff || {}, act = r.activities || {};
+    ['client','code','projectNo','rev','site','standard','leadVerifier','materiality'].forEach(function (k) {
+      if (k in p) s.project[k] = str(p[k]);
+    });
+    ['revDate','periodFrom','periodTo'].forEach(function (k) { s.project[k] = isoStr(p[k]); });
+    if (p.assurance === 'Limited' || p.assurance === 'Reasonable') s.project.assurance = p.assurance;
+    ['prepared','approved','acknowledged'].forEach(function (k) { s.signoff[k] = isoStr(sg[k]); });
+    ALL.forEach(function (i) {
+      var a = act[i[0]] || {};
+      s.activities[i[0]] = {
+        status: STATUSES.indexOf(a.status) >= 0 ? a.status : 'Planned',
+        start: isoStr(a.start), end: isoStr(a.end)
+      };
+    });
+    return s;
+  }
+  function getPath(path) {
+    return path.split('.').reduce(function (o, k) { return o[k]; }, state);
+  }
+  function setPath(path, value) {
+    var parts = path.split('.'), last = parts.pop();
+    parts.reduce(function (o, k) { return o[k]; }, state)[last] = value;
+  }
+  function persist() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      saveEl.textContent = 'บันทึกอัตโนมัติในเครื่องนี้แล้ว';
+      saveEl.classList.remove('bad');
+    } catch (e) {
+      saveEl.textContent = 'บันทึกอัตโนมัติไม่ได้ กรุณากด “บันทึกไฟล์แผน”';
+      saveEl.classList.add('bad');
+    }
+  }
+  function loadSaved() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? normalize(JSON.parse(raw)) : null;
+    } catch (e) { return null; }
+  }
+
+  /* ---------- Dates ---------- */
+  function parse(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    return m ? { y:+m[1], m:+m[2], d:+m[3] } : null;
+  }
+  function yearOk(p) { return !p || (p.y >= 2000 && p.y <= 2099); }
+  function yearMsg(p) {
+    return p.y >= 2500 ? 'ปี ' + p.y + ' เป็นปี พ.ศ. กรุณากรอกเป็น ค.ศ.' : 'ปี ' + p.y + ' ไม่ถูกต้อง กรุณาตรวจปี ค.ศ.';
+  }
+  function monthKey(p) { return p.y * 12 + (p.m - 1); }
+  function dayNum(p) { return Date.UTC(p.y, p.m - 1, p.d) / 86400000; }
+  function dmyDots(s) { var p = parse(s); return p ? pad(p.d) + '.' + pad(p.m) + '.' + p.y : ''; }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function long(s) { var p = parse(s); return p ? p.d + ' ' + MON[p.m - 1] + ' ' + p.y : ''; }
+
+  /* Valid dates of one activity; a date with a bad year or an inverted range draws nothing. */
+  function span(a) {
+    var s = parse(a.start), e = parse(a.end);
+    if (!yearOk(s)) s = null;
+    if (!yearOk(e)) e = null;
+    if (s && e && a.end < a.start) return null;
+    var first = s || e, last = e || s;
+    return first ? { first:first, last:last } : null;
+  }
+  /* Each week column is 7 consecutive days counted from the 1st of the earliest month.
+     Each month heading spans 4 columns (28 days), as in the original document. */
+  function timeline() {
+    var lo = null, hi = null;
+    ALL.forEach(function (i) {
+      var sp = span(state.activities[i[0]]);
+      if (!sp) return;
+      if (lo === null || dayNum(sp.first) < dayNum(lo)) lo = sp.first;
+      if (hi === null || dayNum(sp.last) > hi) hi = dayNum(sp.last);
+    });
+    if (lo === null) { var t = new Date(); lo = { y:t.getFullYear(), m:t.getMonth() + 1, d:1 }; }
+    var baseDay = dayNum({ y:lo.y, m:lo.m, d:1 });
+    var need = hi === null ? 1 : Math.floor((hi - baseDay) / 28) + 1;
+    return { base:monthKey(lo), baseDay:baseDay, baseLabel:'1 ' + MON[lo.m - 1] + ' ' + lo.y,
+             need:need, months:Math.min(MAX_MONTHS, Math.max(MIN_MONTHS, need)) };
+  }
+
+  /* ---------- Document rendering ---------- */
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function revLine() {
+    var p = state.project, r = 'Rev.' + p.rev, d = dmyDots(p.revDate);
+    return { r:r, d:d };
+  }
+  function runningHead() {
+    return '<div class="run-head"><b>GLOBAL CARBON CORPORATION CO., LTD.</b><i>|</i>Accredited GHG Verification Body</div>';
+  }
+  function runningFoot() {
+    var x = revLine(), rd = x.r + (x.d ? ' / ' + x.d : '');
+    return '<div class="run-foot">Project Master Plan (CFO Verification) &nbsp;·&nbsp; ' + esc(rd) +
+           ' &nbsp;·&nbsp; Confidential — for the named client only</div>';
+  }
+  function dayCell(k, i0, i1, first, last, colW, numPt) {
+    if (k < i0 || k > i1) return '<td></td>';
+    var txt = '', size = numPt;
+    if (i0 === i1) {
+      if (first.d === last.d) { txt = String(first.d); }
+      else if (colW < 13) { txt = first.d + '<br>' + last.d; }
+      else {
+        txt = first.d + '–' + last.d;
+        size = Math.min(numPt, colW * 0.92 / (txt.length * 0.56)); /* shrink only as much as the cell needs */
+      }
+    } else if (k === i0) { txt = String(first.d); }
+    else if (k === i1) { txt = String(last.d); }
+    return '<td class="on" style="font-size:' + size.toFixed(2) + 'pt">' + txt + '</td>';
+  }
+  function ganttHtml() {
+    var tl = timeline(), n = tl.months * 4;
+    var wide = tl.months > MIN_MONTHS;
+    var actW = wide ? 246 : 268.5, weeksW = 780 - 24 - actW - 51.5 - 57.5, colW = weeksW / n;
+    var wkPt = clamp(colW * 0.34, 4.4, 6.5), numPt = clamp(colW * 0.4, 4.8, 7.6);
+    var h = '<table class="gantt"><colgroup><col style="width:24pt"><col style="width:' + actW + 'pt"><col style="width:51.5pt"><col style="width:57.5pt">';
+    for (var c = 0; c < n; c++) h += '<col style="width:' + colW.toFixed(3) + 'pt">';
+    h += '</colgroup><thead><tr><th rowspan="2">No.</th><th rowspan="2" class="left">Activity / Deliverable</th><th rowspan="2">Resp.</th><th rowspan="2">Status</th>';
+    for (var m = 0; m < tl.months; m++) {
+      var key = tl.base + m, mon = MON[key % 12], yr = String(Math.floor(key / 12)).slice(-2);
+      h += '<th colspan="4">' + mon + '-' + yr + '</th>';
+    }
+    h += '</tr><tr>';
+    for (var w = 0; w < n; w++) h += '<th class="wk" style="font-size:' + wkPt.toFixed(2) + 'pt">W' + (w % 4 + 1) + '</th>';
+    h += '</tr></thead><tbody>';
+    PHASES.forEach(function (ph, pi) {
+      h += '<tr class="phase"><td colspan="' + (4 + n) + '"><span>PHASE ' + (pi + 1) + '</span><i>·</i>' + esc(ph.name) + '</td></tr>';
+      ph.items.forEach(function (it) {
+        var id = it[0], a = state.activities[id], sp = span(a);
+        h += '<tr class="act' + (id % 2 ? '' : ' even') + '"><td class="no">' + id + '</td><td class="name">' + esc(it[1]) + '</td>' +
+             '<td class="b r-' + it[2] + '">' + it[2] + '</td><td class="b s-' + a.status.replace(' ', '') + '">' + esc(a.status) + '</td>';
+        var i0 = -1, i1 = -1;
+        if (sp) {
+          i0 = Math.floor((dayNum(sp.first) - tl.baseDay) / 7);
+          i1 = Math.floor((dayNum(sp.last) - tl.baseDay) / 7);
+        }
+        for (var k = 0; k < n; k++) {
+          h += sp ? dayCell(k, i0, i1, sp.first, sp.last, colW, numPt) : '<td></td>';
+        }
+        h += '</tr>';
+      });
+    });
+    return h + '</tbody></table>';
+  }
+  function dateLine(s) {
+    var p = parse(s);
+    if (!p || !yearOk(p)) return 'Date &nbsp;……… / ……… / ………';
+    return 'Date &nbsp;…' + pad(p.d) + '…… / …' + pad(p.m) + '…… / …' + String(p.y).slice(-2) + '……';
+  }
+  function signBox(title, role, org, date) {
+    return '<div class="sign"><h4>' + title + '</h4><p>(………………………………………………………)</p><p class="role">' + role +
+           '</p><p class="org">' + org + '</p><p class="date">' + dateLine(date) + '</p></div>';
+  }
+  function renderDoc() {
+    var p = state.project, x = revLine();
+    var period = [long(p.periodFrom), long(p.periodTo)].filter(Boolean).join(' – ');
+    var ass = ['Limited','Reasonable'].map(function (v) { return v === p.assurance ? '<u>' + v + '</u>' : v; }).join(' &nbsp;/&nbsp; ');
+    var page1 =
+      '<div class="sheet" id="p1">' + runningHead() +
+      '<img class="logo" src="' + LOGO + '" alt="">' +
+      '<div class="head-rule"></div>' +
+      '<div class="head-txt"><h1>PROJECT MASTER PLAN</h1><p>Greenhouse Gas Verification — Carbon Footprint for Organization (CFO)</p><p>TGO Guideline</p></div>' +
+      '<div class="band"></div>' +
+      '<div class="content" id="p1content">' +
+        '<table class="info"><colgroup><col style="width:92pt"><col style="width:168pt"><col style="width:71pt"><col style="width:189pt"><col style="width:89pt"><col style="width:171pt"></colgroup>' +
+        '<tr><td class="k">Client</td><td>' + esc(p.client) + '</td><td class="k">Project No.</td><td>' + esc(p.projectNo) + '</td><td class="k">Revision / Date</td><td>' + esc(x.r) + (x.d ? ' &nbsp;/&nbsp; ' + esc(x.d) : '') + '</td></tr>' +
+        '<tr><td class="k">Site / Location</td><td>' + esc(p.site) + '</td><td class="k">Reporting Period</td><td>' + esc(period) + '</td><td class="k">Level of Assurance</td><td>' + ass + '</td></tr>' +
+        '<tr><td class="k">Standard &amp; Criteria</td><td>' + esc(p.standard) + '</td><td class="k">Lead Verifier</td><td>' + esc(p.leadVerifier) + '</td><td class="k">Materiality</td><td>' + esc(p.materiality) + '</td></tr>' +
+        '</table>' +
+        ganttHtml() +
+        '<div class="legend"><h3>LEGEND</h3><div>' +
+          '<span><i style="background:#00b050"></i>Scheduled activity</span>' +
+          '<span><i style="background:#9fb8a6"></i>Completed</span>' +
+          '<span><i style="background:#d3dfd6"></i>In progress</span>' +
+          '<span><i style="background:#f0f2f0"></i>Planned</span>' +
+          '<span><i style="background:#e9eeea"></i>Project phase</span>' +
+        '</div></div>' +
+        '<p class="remark"><b>Remark:</b> &nbsp;Activities no. 9 – 16 may shift depending on the time required for client correspondence and closure of findings.<br>' +
+        'Shaded cells show the planned period of each activity; the numbers indicate its start and end calendar dates.<br>' +
+        'Each week column covers 7 consecutive days counted from ' + esc(timeline().baseLabel) + ', so a date near a month end may appear under the next month’s heading.</p>' +
+      '</div>' + runningFoot() + '</div>';
+    var s = state.signoff;
+    var page2 =
+      '<div class="sheet" id="p2">' + runningHead() +
+      '<div class="signs">' +
+        signBox('Prepared by', 'Lead Verifier', 'Global Carbon Corporation Co., Ltd.', s.prepared) +
+        signBox('Approved by', 'Verification Manager', 'Global Carbon Corporation Co., Ltd.', s.approved) +
+        signBox('Acknowledged by', 'Authorised Representative', 'Client Organization', s.acknowledged) +
+      '</div>' + runningFoot() + '</div>';
+    sheets.innerHTML = page1 + page2;
+    /* Long client names or addresses push the table down: tighten the rows so page 1 still fits. */
+    var c = $('p1content');
+    if (c.scrollHeight > c.clientHeight + 1) $('p1').classList.add('tight');
+    fitPreview();
+  }
+  function fitPreview() {
+    var w = stage.clientWidth;
+    var full = sheets.firstChild ? sheets.firstChild.offsetWidth : 1;
+    var s = Math.min(1.4, w / full);
+    sheets.style.transform = 'scale(' + s + ')';
+    stage.style.height = Math.ceil(sheets.offsetHeight * s) + 'px';
+  }
+
+  /* ---------- Checks ---------- */
+  function checkYear(list, label, path) {
+    var p = parse(getPath(path));
+    if (p && !yearOk(p)) list.push({ t:label + ': ' + yearMsg(p), path:path });
+  }
+  function validate() {
+    var errors = [], warns = [], missing = [], filled = 0;
+    var p = state.project;
+    var req = [['client','Client'],['projectNo','Project No.'],['rev','Revision'],['revDate','Revision Date'],['site','Site / Location'],
+               ['periodFrom','Reporting Period เริ่มต้น'],['periodTo','Reporting Period สิ้นสุด'],['standard','Standard & Criteria'],['leadVerifier','Lead Verifier'],['materiality','Materiality']];
+    req.forEach(function (r) { if (!String(p[r[0]]).trim()) warns.push({ t:r[1], path:'project.' + r[0] }); });
+
+    checkYear(errors, 'Revision Date', 'project.revDate');
+    checkYear(errors, 'Reporting Period เริ่มต้น', 'project.periodFrom');
+    checkYear(errors, 'Reporting Period สิ้นสุด', 'project.periodTo');
+    checkYear(errors, 'วันที่ Prepared by', 'signoff.prepared');
+    checkYear(errors, 'วันที่ Approved by', 'signoff.approved');
+    checkYear(errors, 'วันที่ Acknowledged by', 'signoff.acknowledged');
+    if (p.periodFrom && p.periodTo && p.periodTo < p.periodFrom) {
+      errors.push({ t:'Reporting Period: วันสิ้นสุดอยู่ก่อนวันเริ่มต้น', path:'project.periodTo' });
+    }
+
+    var rowMsgs = {};
+    ALL.forEach(function (i) {
+      var id = i[0], a = state.activities[id], s = parse(a.start), e = parse(a.end), msg = '';
+      if (s && !yearOk(s)) {
+        msg = 'วันเริ่มต้น: ' + yearMsg(s);
+        errors.push({ t:'กิจกรรม ' + id + ' ' + msg, path:'activities.' + id + '.start' });
+      } else if (e && !yearOk(e)) {
+        msg = 'วันสิ้นสุด: ' + yearMsg(e);
+        errors.push({ t:'กิจกรรม ' + id + ' ' + msg, path:'activities.' + id + '.end' });
+      } else if (s && e && a.end < a.start) {
+        msg = 'วันสิ้นสุดอยู่ก่อนวันเริ่มต้น';
+        errors.push({ t:'กิจกรรม ' + id + ': ' + msg, path:'activities.' + id + '.end' });
+      } else if (!s && e) {
+        msg = 'ยังไม่มีวันเริ่มต้น';
+      }
+      rowMsgs[id] = msg;
+      if (s) filled++; else missing.push(id);
+    });
+
+    var tl = timeline();
+    if (tl.need > MAX_MONTHS) {
+      errors.push({ t:'แผนงานยาวเกิน ' + (MAX_MONTHS * 4) + ' สัปดาห์ที่ตารางรองรับ กรุณาตรวจวันที่', path:null });
+    }
+    var c = $('p1content');
+    if (c && c.scrollHeight > c.clientHeight + 1) {
+      errors.push({ t:'ข้อความส่วนหัวยาวเกินหน้ากระดาษ กรุณาย่อ Client หรือ Site / Location', path:'project.site' });
+    }
+    return { errors:errors, warns:warns, missing:missing, filled:filled, rowMsgs:rowMsgs };
+  }
+  function renderChecks() {
+    var v = validate(), box = document.createElement('div');
+    var count = document.createElement('div');
+    count.className = 'count';
+    count.textContent = 'กรอกวันแล้ว ' + v.filled + ' / ' + ALL.length + ' กิจกรรม';
+    box.appendChild(count);
+    function group(cls, title, items) {
+      var g = document.createElement('div'), b = document.createElement('b'), ul = document.createElement('ul');
+      g.className = 'group ' + cls; b.textContent = title; g.appendChild(b);
+      items.forEach(function (it) {
+        var li = document.createElement('li');
+        if (it.path) {
+          var btn = document.createElement('button');
+          btn.type = 'button'; btn.textContent = it.t; btn.dataset.focus = it.path;
+          li.appendChild(btn);
+        } else { li.textContent = it.t; }
+        ul.appendChild(li);
+      });
+      g.appendChild(ul);
+      box.appendChild(g);
+    }
+    var miss = v.warns.slice();
+    if (v.missing.length) miss.push({ t:'วันเริ่มต้นของกิจกรรม ' + v.missing.join(', '), path:'activities.' + v.missing[0] + '.start' });
+    if (v.errors.length) group('err', 'ต้องแก้ก่อนออก PDF', v.errors);
+    if (miss.length) group('warn', 'ยังกรอกไม่ครบ', miss);
+    if (!v.errors.length && !miss.length) {
+      var g = document.createElement('div');
+      g.className = 'group ok'; g.textContent = 'ครบถ้วน พร้อมออก PDF';
+      box.appendChild(g);
+    }
+    checksEl.textContent = '';
+    checksEl.appendChild(box);
+
+    var badPaths = {};
+    v.errors.forEach(function (e) { if (e.path) badPaths[e.path] = true; });
+    form.querySelectorAll('[data-path]').forEach(function (el) {
+      if (el.type === 'radio') return;
+      if (badPaths[el.dataset.path]) el.setAttribute('aria-invalid', 'true');
+      else el.removeAttribute('aria-invalid');
+    });
+    ALL.forEach(function (i) {
+      var id = i[0];
+      $('err-' + id).textContent = v.rowMsgs[id] || '';
+      var startVal = state.activities[id].start;
+      var endEl = form.querySelector('[data-path="activities.' + id + '.end"]');
+      if (startVal) endEl.min = startVal; else endEl.removeAttribute('min');
+    });
+    return v;
+  }
+
+  /* ---------- Form ---------- */
+  function buildSchedule() {
+    var html = '';
+    PHASES.forEach(function (ph, pi) {
+      html += '<div class="phase-title"><small>PHASE ' + (pi + 1) + '</small>' + esc(ph.name) + '</div>';
+      ph.items.forEach(function (it) {
+        var id = it[0];
+        html += '<div class="sched-row">' +
+          '<span class="n">' + id + '</span>' +
+          '<div class="act">' + esc(it[1]) + '<br><span class="tag ' + it[2] + '">' + it[2] + '</span></div>' +
+          '<div class="ctl"><label class="mobile-lbl" for="st-' + id + '">สถานะ</label><select id="st-' + id + '" aria-label="สถานะกิจกรรม ' + id + '" data-path="activities.' + id + '.status">' +
+            STATUSES.map(function (s) { return '<option value="' + s + '">' + s + '</option>'; }).join('') + '</select></div>' +
+          '<div class="ctl"><label class="mobile-lbl" for="s-' + id + '">วันเริ่มต้น</label><input type="date" id="s-' + id + '" aria-label="วันเริ่มต้นกิจกรรม ' + id + '" data-path="activities.' + id + '.start"></div>' +
+          '<div class="ctl"><label class="mobile-lbl" for="e-' + id + '">วันสิ้นสุด</label><input type="date" id="e-' + id + '" aria-label="วันสิ้นสุดกิจกรรม ' + id + '" data-path="activities.' + id + '.end"></div>' +
+          '<div class="row-err" id="err-' + id + '"></div>' +
+        '</div>';
+      });
+    });
+    $('schedule').innerHTML = html;
+  }
+  function fillForm() {
+    form.querySelectorAll('[data-path]').forEach(function (el) {
+      var v = getPath(el.dataset.path);
+      if (el.type === 'radio') el.checked = el.value === v;
+      else el.value = v;
+    });
+  }
+  function refresh() {
+    renderDoc();
+    renderChecks();
+  }
+  function changed() {
+    dirty = true;
+    persist();
+    refresh();
+  }
+  function onField(e) {
+    var el = e.target;
+    if (!el.dataset || !el.dataset.path) return;
+    if (el.type === 'radio' && !el.checked) return;
+    setPath(el.dataset.path, el.value);
+    changed();
+  }
+  form.addEventListener('input', onField);
+  form.addEventListener('change', onField);
+  checksEl.addEventListener('click', function (e) {
+    var path = e.target.dataset && e.target.dataset.focus;
+    if (!path) return;
+    var el = form.querySelector('[data-path="' + path + '"]');
+    if (el) { el.scrollIntoView({ block:'center', behavior:'smooth' }); el.focus({ preventScroll:true }); }
+  });
+
+  /* ---------- File name / actions ---------- */
+  function baseName() {
+    var p = state.project;
+    var clean = function (s) { return String(s).trim().replace(/[\\\/:*?"<>|\s]+/g, '-'); };
+    var name = 'Master_Plan_CFO_Rev' + clean(p.rev);
+    var tail = clean(p.code);
+    return tail ? name + '_' + tail : name;
+  }
+  var pageTitle = document.title;
+  window.addEventListener('beforeprint', function () { document.title = baseName(); });
+  window.addEventListener('afterprint', function () { document.title = pageTitle; });
+
+  $('btnPdf').addEventListener('click', function () {
+    var v = renderChecks();
+    if (v.errors.length) {
+      checksEl.scrollIntoView({ block:'center', behavior:'smooth' });
+      return;
+    }
+    var incomplete = v.warns.length + v.missing.length;
+    if (incomplete && !window.confirm('ยังกรอกไม่ครบ ' + incomplete + ' รายการ ต้องการออก PDF ฉบับร่างเลยหรือไม่?')) return;
+    window.print();
+  });
+  $('btnSave').addEventListener('click', function () {
+    var blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = baseName() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    dirty = false;
+  });
+  $('btnOpen').addEventListener('click', function () {
+    if (dirty && !window.confirm('แผนที่กำลังกรอกจะถูกแทนที่ด้วยไฟล์ที่เปิด ยังไม่ได้บันทึกเป็นไฟล์ ต้องการเปิดต่อหรือไม่?')) return;
+    $('fileInput').click();
+  });
+  $('fileInput').addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var raw;
+      try { raw = JSON.parse(reader.result); } catch (err) { raw = null; }
+      if (!raw || raw.schema !== SCHEMA) {
+        window.alert('เปิดไฟล์ไม่ได้: ไฟล์นี้ไม่ใช่ไฟล์แผนจากหน้านี้');
+        return;
+      }
+      state = normalize(raw);
+      fillForm();
+      persist();
+      refresh();
+      dirty = false;
+    };
+    reader.onerror = function () { window.alert('อ่านไฟล์ไม่สำเร็จ กรุณาลองใหม่'); };
+    reader.readAsText(file);
+  });
+  $('btnNew').addEventListener('click', function () {
+    if (dirty && !window.confirm('ข้อมูลที่กรอกอยู่ยังไม่ได้บันทึกเป็นไฟล์ และจะถูกล้าง ต้องการเริ่มแผนใหม่หรือไม่?')) return;
+    state = blank();
+    fillForm();
+    persist();
+    refresh();
+    dirty = false;
+  });
+
+  /* ---------- Start ---------- */
+  buildSchedule();
+  state = loadSaved() || blank();
+  fillForm();
+  refresh();
+  if (window.ResizeObserver) new ResizeObserver(fitPreview).observe(stage);
+  window.addEventListener('resize', fitPreview);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
+})();
+</script>
+</body>
+</html>
