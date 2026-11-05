@@ -412,6 +412,45 @@ button.g-bar{cursor:pointer}
   .ov-search{width:100%!important}
 }
 
+/* ---------- Sign-in, sync status, choices ---------- */
+.auth{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;overflow:auto;background:var(--bg)}
+.auth-card{display:flex;flex-direction:column;gap:12px;width:min(400px,100%);padding:28px 28px 22px;background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.auth-card img{width:62px;height:auto;align-self:center}
+.auth-card h1{margin:2px 0 0;font-size:21px;line-height:1.3;color:var(--brand-d);text-align:center}
+.auth-sub{margin:-8px 0 2px;color:var(--muted);font-size:14px;text-align:center}
+.auth-err{margin:0;color:var(--danger);font-size:13.5px}
+.auth-err:empty{display:none}
+.auth-card input[type=password]{width:100%;min-height:44px;padding:9px 12px;border:1px solid var(--line-2);border-radius:var(--r-s);background:#fff}
+.auth-card input[type=password]:focus{outline:0;border-color:var(--brand);box-shadow:0 0 0 3px rgba(46,106,79,.16)}
+.auth-rm{font-size:13px}
+.auth-go{width:100%}
+.auth-go[disabled]{opacity:.65;cursor:progress}
+.auth-link{border:0;background:none;padding:4px;color:var(--muted);font-size:13px;text-decoration:underline}
+.auth-link:hover{color:var(--brand-d)}
+.auth-row{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.sync-chip{display:flex;align-items:center;gap:8px;min-width:0;padding-right:6px;margin-right:2px;border-right:1px solid var(--line)}
+.sync-status{font-size:12.5px;white-space:nowrap}
+.sync-status.ok{color:var(--ok)}
+.sync-status.busy{color:var(--muted)}
+.sync-status.off{color:var(--warn);font-weight:600}
+.sync-user{max-width:130px;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sync-out{min-height:30px;padding:2px 8px;border:0;border-radius:7px;background:none;font-size:12.5px;color:var(--muted);text-decoration:underline;white-space:nowrap}
+.sync-out:hover{background:var(--brand-softer);color:var(--brand-d)}
+.local-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 12px;padding:6px 16px;background:#fdf6e6;border-bottom:1px solid #f0e2bd;color:var(--warn);font-size:13.5px}
+.local-bar button{border:0;background:none;color:inherit;font-weight:700;text-decoration:underline;padding:2px 4px}
+.mp-modal{position:fixed;inset:0;z-index:75;display:grid;place-items:center;padding:20px;background:rgba(30,42,36,.42)}
+.mp-box{width:min(480px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:22px 24px;background:#fff;border-radius:var(--r);box-shadow:0 20px 56px rgba(30,42,36,.3)}
+.mp-box h2{margin:0 0 8px;font-size:18px;color:var(--brand-d)}
+.mp-box p{margin:0 0 10px;font-size:14.5px;color:var(--ink)}
+.mp-box ul{margin:0 0 12px;padding-left:20px;font-size:14px;color:var(--muted)}
+.mp-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.gt-meta-line{flex-basis:100%;order:9;font-size:12.5px;color:var(--muted)}
+.gt-local{display:inline-block;padding:0 6px;border-radius:5px;background:#fdf6e6;color:var(--warn);font-size:11.5px;font-weight:700;line-height:18px;white-space:nowrap}
+body.readonly .fu-done,body.readonly .gt-actions .danger,body.readonly #draftCard{display:none!important}
+.date-btn[disabled],.chip[disabled],.seg input[disabled]+span,.choice input[disabled]+span{opacity:.62;cursor:not-allowed}
+@media (max-width:1180px){.sync-status{display:none}}
+@media (max-width:820px){.sync-chip{border-right:0;margin-right:0}.sync-user{max-width:90px}}
+
 /* ---------- Document sheet (matches the original Master Plan, A4 landscape) ---------- */
 .sheet{position:relative;width:297mm;height:210mm;overflow:hidden;background:#fff;color:#3a423e;font-family:Tahoma,"Leelawadee UI","Noto Sans Thai",sans-serif;font-size:7pt;line-height:1.2;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .sheet *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -529,6 +568,7 @@ button.g-bar{cursor:pointer}
     <button type="button" data-view="plan">กรอกแผน</button>
   </nav>
   <div class="tools">
+    <div class="sync-chip" id="syncChip" hidden><span class="sync-status" id="syncStatus" role="status"></span><span class="sync-user" id="syncUser"></span><button type="button" class="sync-out" id="syncLogout">ออกจากระบบ</button></div>
     <span id="saveState" class="save-state" role="status"></span>
     <button type="button" class="tool" id="btnNew" title="เริ่มวางแผนเคสใหม่ เคสเดิมยังอยู่ในภาพรวม"><svg class="ic"><use href="#i-plus"/></svg><span>เคสใหม่</span></button>
     <button type="button" class="tool" id="btnOpen" title="เปิดไฟล์แผน .json ที่เคยบันทึกไว้"><svg class="ic"><use href="#i-open"/></svg><span>เปิดไฟล์แผน</span></button>
@@ -539,6 +579,7 @@ button.g-bar{cursor:pointer}
   <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
 </header>
 <div class="demo-bar ui" id="demoBar" hidden>กำลังดูข้อมูลตัวอย่าง ไม่ใช่ลูกค้าจริง และจะไม่ถูกบันทึก<button type="button" id="demoExit">ออกจากตัวอย่าง</button></div>
+<div class="local-bar ui" id="localBar" hidden>ยังไม่ได้เข้าสู่ระบบ ข้อมูลอยู่เฉพาะเครื่องนี้ คนอื่นจะไม่เห็น<button type="button" id="localLogin">เข้าสู่ระบบ</button></div>
 
 <main class="views">
 <section class="page ui" id="casesView"></section>
@@ -559,7 +600,7 @@ button.g-bar{cursor:pointer}
       <div class="hero">
         <h1>เริ่มจากข้อมูลโครงการ</h1>
         <p>ข้อมูลส่วนนี้จะแสดงที่หัวเอกสาร ค่าที่ใช้ประจำใส่ไว้ให้แล้ว แก้ได้ถ้าโครงการนี้ต่างออกไป</p>
-        <div class="privacy"><svg class="ic"><use href="#i-lock"/></svg>ข้อมูลที่กรอกเก็บไว้ในเบราว์เซอร์ของเครื่องนี้เท่านั้น ไม่ถูกส่งขึ้นอินเทอร์เน็ต</div>
+        <div class="privacy"><svg class="ic"><use href="#i-lock"/></svg><span id="privacyText">ข้อมูลที่กรอกเก็บไว้ในเบราว์เซอร์ของเครื่องนี้เท่านั้น ไม่ถูกส่งขึ้นอินเทอร์เน็ต</span></div>
       </div>
       <div class="cards">
         <div class="card">
@@ -657,6 +698,8 @@ button.g-bar{cursor:pointer}
 <div class="picker ui" id="picker" role="dialog" aria-modal="false" hidden></div>
 <div class="toast ui" id="toast" role="status" hidden></div>
 <div class="g-tip ui" id="gTip" hidden></div>
+<div class="mp-modal ui" id="mpModal" hidden></div>
+<div class="auth ui" id="authView" hidden></div>
 
 <script>
 (function () {
@@ -1156,13 +1199,14 @@ button.g-bar{cursor:pointer}
     renderDateButtons();
     renderMini();
     $('fileName').textContent = baseName() + '.pdf';
-    $('btnSave').classList.toggle('unsaved', dirty);
+    $('btnSave').classList.toggle('unsaved', dirty && !online());
     renderChecks();
     renderBar();
   }
   function changed() {
     dirty = true;
     persist();
+    syncTouch(state.id);
     refresh();
   }
   function setDate(path, v) { setPath(path, v); changed(); }
@@ -1203,7 +1247,7 @@ button.g-bar{cursor:pointer}
     if (step === 1) next.innerHTML = 'ถัดไป: วางแผนงาน' + ic('right');
     else if (step === 2) next.innerHTML = 'ถัดไป: ตรวจและออก PDF' + ic('right');
     else next.innerHTML = ic('pdf') + 'ออก PDF';
-    info.textContent = saveEl.textContent ? saveEl.textContent + (dirty ? ' · ยังไม่ได้บันทึกเป็นไฟล์' : '') : '';
+    info.textContent = online() ? syncText() : saveEl.textContent ? saveEl.textContent + (dirty ? ' · ยังไม่ได้บันทึกเป็นไฟล์' : '') : '';
   }
   function goTo(path) {
     if (view !== 'plan') showView('plan');
@@ -1486,7 +1530,7 @@ button.g-bar{cursor:pointer}
       return;
     }
     var mini = e.target.closest('[data-open-row]');
-    if (mini) { openPicker(document.querySelector('.date-btn[data-row="' + mini.dataset.openRow + '"]')); return; }
+    if (mini) { if (canEditCases()) openPicker(document.querySelector('.date-btn[data-row="' + mini.dataset.openRow + '"]')); return; }
     var chip = e.target.closest('[data-year],[data-today],[data-same]');
     if (chip) {
       var d = chip.dataset;
@@ -1521,6 +1565,7 @@ button.g-bar{cursor:pointer}
       state.activities = JSON.parse(before);
       dirty = wasDirty;
       persist();
+      syncTouch(state.id);
       refresh();
     });
   }
@@ -1665,7 +1710,7 @@ button.g-bar{cursor:pointer}
     var cases = caseList();
     if (!cases.length) {
       host.innerHTML = '<div class="card ov-empty"><h2>ยังไม่มีเคสในเครื่องนี้</h2>' +
-        '<p>พอเริ่มวางแผนหรือเปิดไฟล์แผนของลูกค้า เคสจะมาแสดงในหน้านี้ พร้อมวันที่ที่ต้องตาม ข้อมูลเก็บไว้ในเบราว์เซอร์ของเครื่องนี้เท่านั้น</p>' +
+        '<p>พอเริ่มวางแผนหรือเปิดไฟล์แผนของลูกค้า เคสจะมาแสดงในหน้านี้ พร้อมวันที่ที่ต้องตาม ' + esc(privacyText()) + '</p>' +
         '<div class="row"><button type="button" class="btn primary" data-ov="new">' + ic('plus') + 'สร้างเคสแรก</button>' +
         '<button type="button" class="btn" data-ov="open">' + ic('open') + 'เปิดไฟล์แผน</button>' +
         '<button type="button" class="btn" data-ov="demo">ดูตัวอย่างหน้าตา</button></div></div>';
@@ -1807,7 +1852,8 @@ button.g-bar{cursor:pointer}
       '<button type="button" class="gt-label" data-toggle="' + esc(c.id) + '" aria-expanded="' + open + '">' + ic('next') +
         '<span><span class="gt-name">' + esc(caseName(c)) + '</span>' +
         '<span class="gt-meta">' + stateHtml(i) +
-        (c.project.projectNo ? '<span class="gt-pno">' + esc(c.project.projectNo) + '</span>' : '') + '</span>' +
+        (c.project.projectNo ? '<span class="gt-pno">' + esc(c.project.projectNo) + '</span>' : '') +
+        (online() && !sync.meta[c.id] && !sync.dirty[c.id] ? '<span class="gt-local">เฉพาะเครื่องนี้</span>' : '') + '</span>' +
         (nextText ? '<span class="gt-next" title="' + esc(nextText) + '">' + esc(nextText) + '</span>' : '') + '</span></button>' +
       '<div class="gt-lane">';
     if (i.dated) {
@@ -1863,7 +1909,8 @@ button.g-bar{cursor:pointer}
     });
     h += '<div class="gt-actions"><button type="button" data-open="' + esc(c.id) + '">เปิดแผนนี้</button>' +
          '<button type="button" data-savefile="' + esc(c.id) + '">บันทึกไฟล์แผน</button>' +
-         '<button type="button" class="danger" data-del="' + esc(c.id) + '">ลบเคสนี้</button></div>';
+         '<button type="button" class="danger" data-del="' + esc(c.id) + '">ลบเคสนี้</button>' +
+         (caseMetaText(c.id) ? '<span class="gt-meta-line">' + esc(caseMetaText(c.id)) + '</span>' : '') + '</div>';
     return h;
   }
 
@@ -1882,14 +1929,17 @@ button.g-bar{cursor:pointer}
     else showStep(firstIncomplete());
   }
   function markDone(id, row) {
+    if (!canEditCases()) return;
     var c = store.cases[id], a = c.activities[row], prev = a.status;
     a.status = 'Done';
     writeStore();
+    syncTouch(id);
     if (c === state) refresh();
     renderCases();
     toast('ทำเครื่องหมายเสร็จแล้ว: กิจกรรม ' + row + ' ของ ' + caseName(c), 'เลิกทำ', function () {
       a.status = prev;
       writeStore();
+      syncTouch(id);
       if (c === state) refresh();
       renderCases();
     });
@@ -1897,6 +1947,7 @@ button.g-bar{cursor:pointer}
   function deleteCase(id) {
     var c = store.cases[id];
     if (!window.confirm('ลบเคส ' + caseName(c) + ' ออกจากเครื่องนี้หรือไม่? ถ้าไม่มีไฟล์สำรองจะกู้คืนไม่ได้')) return;
+    syncForget(id);
     delete store.cases[id];
     delete expanded[id];
     if (state === c) { state = blank(); store.cases[state.id] = state; dirty = false; fillForm(); refresh(); }
@@ -1944,12 +1995,13 @@ button.g-bar{cursor:pointer}
       });
       if (bad.length) window.alert('เปิดไฟล์ไม่ได้: ไฟล์นี้ไม่ใช่ไฟล์แผนจากหน้านี้\n' + bad.join('\n'));
       if (!plans.length) return;
-      var before = JSON.stringify(store.cases), wasId = state.id, added = 0, updated = 0, last = null;
+      var before = JSON.stringify(store.cases), wasId = state.id, added = 0, updated = 0, last = null, touched = [];
       plans.forEach(function (raw) {
         var n = normalize(raw), m = findMatch(n);
         if (m) { n.id = m.id; updated++; } else added++;
         store.cases[n.id] = n;
         last = n;
+        touched.push(n.id);
       });
       if (store.cases[state.id] !== state) state = store.cases[state.id] || state;
       var undo = function () {
@@ -1958,9 +2010,11 @@ button.g-bar{cursor:pointer}
         Object.keys(saved).forEach(function (k) { store.cases[k] = saved[k]; });
         state = store.cases[wasId] || blank();
         store.cases[state.id] = state;
+        touched.forEach(function (id) { if (saved[id]) syncTouch(id); else syncForget(id); });
         fillForm(); refresh(); writeStore();
         if (view === 'cases') renderCases();
       };
+      touched.forEach(syncTouch);
       if (plans.length === 1 && view === 'plan') {
         state = last;
         dirty = false;
@@ -2014,6 +2068,7 @@ button.g-bar{cursor:pointer}
     store.cases[state.id] = state;
     $('demoBar').hidden = false;
     fillForm(); refresh();
+    renderSync();
     showView('cases');
   }
   function exitDemo() {
@@ -2022,6 +2077,7 @@ button.g-bar{cursor:pointer}
     $('demoBar').hidden = true;
     expanded = {};
     fillForm(); refresh();
+    renderSync();
     showView(caseList().length ? 'cases' : 'plan');
   }
   $('demoExit').addEventListener('click', exitDemo);
@@ -2101,6 +2157,537 @@ button.g-bar{cursor:pointer}
   });
   window.addEventListener('scroll', hideTip, { passive:true });
 
+  /* ---------- Shared cases: sign-in and sync with the team script ---------- */
+  /* The page signs in with the GCC Registry accounts (same script, same protocol). The password never
+     leaves the browser: PBKDF2 as in the Registry. localStorage stays the working copy, so a case is
+     saved first and sent after; `sync` remembers each case's server version and what still has to go. */
+  var MP_URL = 'https://script.google.com/macros/s/AKfycbyIpL-1Ks0278Enl_-aNigwoqoTMhVr8Qa3YTZ1ocUg6E-nclehWAM9VF-0rk77wXQ_/exec';
+  var REGISTRY_URL = 'https://mktwni.github.io/customer_vvb/';
+  var SESSION_KEY = 'gcc-mp-session', SYNC_KEY = 'gcc-mp-sync', LOCAL_ONLY_KEY = 'gcc-mp-local-only';
+  var net = { mode:'local', hello:null, status:'', lastOk:0, pushing:false, pulling:false, timer:null, lastPull:0, offline:false, modal:null, queue:[], offered:false };
+  var session = null;
+  var sync = { u:'', meta:{}, dirty:{}, del:{}, skip:{} };
+
+  function online() { return net.mode === 'online' && !demo; }
+  function canEditCases() { return !online() || !!(session && session.me && session.me.caps && session.me.caps['mp.edit']); }
+  function canViewCases() { return !!(session && session.me && session.me.caps && session.me.caps['mp.view']); }
+
+  function loadSync() {
+    try {
+      var s = JSON.parse(localStorage.getItem(SYNC_KEY) || 'null');
+      if (s && typeof s === 'object') sync = { u:String(s.u || ''), meta:s.meta || {}, dirty:s.dirty || {}, del:s.del || {}, skip:s.skip || {} };
+    } catch (e) { /* starts empty */ }
+  }
+  function saveSync() { try { localStorage.setItem(SYNC_KEY, JSON.stringify(sync)); } catch (e) { /* kept in memory */ } }
+  function loadSession() {
+    var raw = null;
+    try { raw = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY); } catch (e) { return null; }
+    try {
+      var s = raw ? JSON.parse(raw) : null;
+      return s && s.tok && Number(s.exp) > Date.now() ? s : null;
+    } catch (e) { return null; }
+  }
+  function saveSession() {
+    try {
+      localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY);
+      if (session) (session.rm ? localStorage : sessionStorage).setItem(SESSION_KEY, JSON.stringify(session));
+    } catch (e) { /* the session lasts until this tab closes */ }
+  }
+  function post(body) {
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function () { ctl.abort(); }, 45000) : null;
+    return fetch(MP_URL, { method:'POST', body:JSON.stringify(body), headers:{ 'Content-Type':'text/plain;charset=utf-8' }, redirect:'follow', signal:ctl ? ctl.signal : undefined })
+      .then(function (r) { return r.json(); })
+      .finally(function () { if (timer) clearTimeout(timer); });
+  }
+  function authed(body) {
+    body.tok = session.tok;
+    return post(body).then(function (o) {
+      if (o && o.tok && session) { session.tok = o.tok; session.exp = o.exp; }
+      if (o && o.me && session) session.me = o.me;
+      if (session) saveSession();
+      if (o && !o.ok && (o.error === 'session_expired' || o.error === 'login_required' || o.error === 'account_disabled')) {
+        sessionLost(o.error);
+        throw { handled:true };
+      }
+      if (o && !o.ok && o.error === 'must_change_password') {
+        showNoAccess('บัญชีนี้ต้องเปลี่ยนรหัสผ่านก่อนใช้งาน กรุณาเปลี่ยนรหัสผ่านที่ GCC Registry แล้วกลับมาเข้าสู่ระบบอีกครั้ง');
+        throw { handled:true };
+      }
+      if (o && !o.ok && o.error === 'forbidden') {
+        if (!canViewCases()) showNoAccess();
+        else toast('บัญชีนี้แก้ไข Master Plan ไม่ได้');
+      }
+      return o;
+    });
+  }
+  var AUTH_MSG = {
+    bad_login:'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
+    too_many_attempts:'ลองเข้าสู่ระบบผิดหลายครั้งเกินไป กรุณารอสักครู่แล้วลองใหม่',
+    account_disabled:'บัญชีนี้ถูกปิดการใช้งาน กรุณาติดต่อผู้ดูแลระบบ',
+    no_accounts:'ระบบกลางยังไม่มีบัญชีผู้ใช้',
+    busy:'ระบบกำลังทำงานอยู่ กรุณาลองใหม่อีกครั้ง'
+  };
+  function derivePk(tid, it, u, pw) {
+    var subtle = window.crypto && window.crypto.subtle;
+    if (!subtle) return Promise.reject(new Error('เบราว์เซอร์นี้เข้ารหัสไม่ได้ กรุณาเปิดผ่าน https ด้วย Chrome หรือ Edge'));
+    var enc = new TextEncoder();
+    return subtle.importKey('raw', enc.encode(pw.normalize('NFC')), 'PBKDF2', false, ['deriveBits']).then(function (key) {
+      return subtle.deriveBits({ name:'PBKDF2', hash:'SHA-256', salt:enc.encode('gcc-team|v1|' + tid + '|' + u), iterations:it }, key, 256);
+    }).then(function (bits) {
+      var s = '';
+      new Uint8Array(bits).forEach(function (b) { s += String.fromCharCode(b); });
+      return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    });
+  }
+
+  /* ---------- Sign-in screen ---------- */
+  function showAuth(msg, noAccess) {
+    closePicker();
+    var a = $('authView');
+    a.hidden = false;
+    document.body.classList.add('auth-open');
+    if (noAccess) {
+      a.innerHTML = '<div class="auth-card"><img src="' + LOGO + '" alt="Global Carbon Corporation"><h1>ยังไม่มีสิทธิ์เข้าใช้ Master Plan</h1>' +
+        '<p class="auth-sub">' + esc(msg || 'บัญชีนี้เข้าสู่ระบบได้ แต่ยังไม่ได้รับสิทธิ์ “ดู Master Plan (CFO)” กรุณาให้ผู้ดูแลระบบเพิ่มสิทธิ์ใน GCC Registry แล้วลองอีกครั้ง') + '</p>' +
+        '<div class="auth-row"><button type="button" class="btn primary" data-auth="retry">ลองอีกครั้ง</button><button type="button" class="btn" data-auth="logout">ออกจากระบบ</button></div></div>';
+      return;
+    }
+    a.innerHTML = '<form class="auth-card" id="authForm" autocomplete="on"><img src="' + LOGO + '" alt="Global Carbon Corporation">' +
+      '<h1>เข้าสู่ระบบ Master Plan</h1><p class="auth-sub">ใช้บัญชีเดียวกับ GCC Registry</p>' +
+      '<p class="auth-err" id="authErr" role="alert">' + esc(msg || '') + '</p>' +
+      '<div class="fld"><label for="authU">ชื่อผู้ใช้</label><input type="text" id="authU" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>' +
+      '<div class="fld"><label for="authP">รหัสผ่าน</label><input type="password" id="authP" name="password" autocomplete="current-password" required></div>' +
+      '<label class="ov-check auth-rm"><input type="checkbox" id="authRm"> จดจำฉันในเครื่องนี้ (ไม่ควรเลือกถ้าเป็นเครื่องส่วนกลาง)</label>' +
+      '<button type="submit" class="btn primary auth-go" id="authGo">เข้าสู่ระบบ</button>' +
+      '<button type="button" class="auth-link" data-auth="local">ใช้เฉพาะเครื่องนี้โดยไม่เข้าสู่ระบบ</button></form>';
+    if (sync.u) $('authU').value = sync.u;
+    ($('authU').value ? $('authP') : $('authU')).focus();
+  }
+  function hideAuth() { $('authView').hidden = true; $('authView').innerHTML = ''; document.body.classList.remove('auth-open'); }
+  function showNoAccess(msg) { net.mode = 'blocked'; showAuth(msg, true); renderSync(); }
+  function sessionLost(reason) {
+    session = null;
+    saveSession();
+    net.mode = 'auth';
+    showAuth(reason === 'account_disabled' ? AUTH_MSG.account_disabled : 'การเข้าสู่ระบบหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง งานที่ยังไม่ได้ส่งยังอยู่ในเครื่องนี้');
+    renderSync();
+  }
+  function doLogin() {
+    var u = String($('authU').value || '').trim().toLowerCase(), pw = $('authP').value, rm = $('authRm').checked;
+    var err = $('authErr'), go = $('authGo');
+    if (!/^[a-z0-9][a-z0-9._-]{2,31}$/.test(u)) { err.textContent = AUTH_MSG.bad_login; return; }
+    go.disabled = true; go.textContent = 'กำลังเข้าสู่ระบบ…'; err.textContent = '';
+    var done = function (m) { go.disabled = false; go.textContent = 'เข้าสู่ระบบ'; err.textContent = m; };
+    (net.hello ? Promise.resolve(net.hello) : post({ action:'hello' })).then(function (h) {
+      if (!h || !h.ok || !h.tid) throw new Error('hello');
+      net.hello = h;
+      return derivePk(h.tid, Number(h.it), u, pw);
+    }).then(function (pk) {
+      return post({ action:'login', u:u, pk:pk, rm:rm });
+    }).then(function (o) {
+      if (!o.ok) {
+        if (o.error === 'locked') done('บัญชีถูกล็อกชั่วคราว กรุณาลองใหม่ในอีก ' + Math.ceil((Number(o.retryIn) || 60) / 60) + ' นาที');
+        else done(AUTH_MSG[o.error] || 'เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่');
+        return;
+      }
+      session = { tok:o.tok, exp:o.exp, rm:rm, u:u, me:o.me };
+      saveSession();
+      try { sessionStorage.removeItem(LOCAL_ONLY_KEY); } catch (e) { /* ignore */ }
+      if (o.mc) { showNoAccess('บัญชีนี้ต้องเปลี่ยนรหัสผ่านก่อนใช้งาน กรุณาเปลี่ยนรหัสผ่านที่ GCC Registry แล้วกลับมาเข้าสู่ระบบอีกครั้ง'); return; }
+      startOnline();
+    }).catch(function (e) {
+      if (e && e.message && /เบราว์เซอร์/.test(e.message)) done(e.message);
+      else done('เชื่อมต่อระบบกลางไม่ได้ กรุณาตรวจอินเทอร์เน็ตแล้วลองใหม่');
+    });
+  }
+  function useLocalOnly() {
+    try { sessionStorage.setItem(LOCAL_ONLY_KEY, '1'); } catch (e) { /* this load only */ }
+    net.mode = 'local';
+    hideAuth();
+    renderSync();
+  }
+  $('authView').addEventListener('submit', function (e) { e.preventDefault(); doLogin(); });
+  $('authView').addEventListener('click', function (e) {
+    var a = e.target.dataset && e.target.dataset.auth;
+    if (a === 'local') useLocalOnly();
+    else if (a === 'logout') doLogout();
+    else if (a === 'retry') startOnline();
+  });
+
+  /* ---------- Going online ---------- */
+  function startOnline() {
+    if (!session) return;
+    if (session.me && session.me.caps && !session.me.caps['mp.view']) { showNoAccess(); return; }
+    /* another account on this browser must not keep the previous one's cached cases */
+    if (sync.u && sync.u !== session.u) {
+      Object.keys(sync.meta).forEach(function (id) { delete store.cases[id]; });
+      if (!store.cases[state.id]) { state = blank(); store.cases[state.id] = state; }
+      sync = { u:session.u, meta:{}, dirty:{}, del:{}, skip:{} };
+      fillForm();
+    }
+    sync.u = session.u;
+    saveSync();
+    net.mode = 'online';
+    hideAuth();
+    renderSync();
+    refreshView();
+    syncNow(true);
+  }
+  function doLogout() {
+    var pending = Object.keys(sync.dirty).length + Object.keys(sync.del).length;
+    if (pending && !window.confirm('ยังมี ' + pending + ' รายการที่ยังไม่ได้ส่งขึ้นระบบกลาง ถ้าออกตอนนี้และลบข้อมูลในเครื่อง รายการนั้นจะหาย ต้องการออกจากระบบหรือไม่?')) return;
+    var clear = window.confirm('ลบข้อมูลเคสที่เก็บไว้ในเครื่องนี้ด้วยหรือไม่? แนะนำให้กด OK ถ้าเป็นเครื่องส่วนกลาง');
+    if (session) post({ action:'logout', tok:session.tok }).catch(function () { /* the token expires by itself */ });
+    session = null;
+    saveSession();
+    if (clear) {
+      store.cases = {};
+      state = blank();
+      store.cases[state.id] = state;
+      sync = { u:'', meta:{}, dirty:{}, del:{}, skip:{} };
+      saveSync();
+      writeStore();
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* nothing to remove */ }
+      fillForm();
+    }
+    net.mode = 'auth';
+    expanded = {};
+    refresh();
+    refreshView();
+    showAuth();
+    renderSync();
+  }
+
+  /* ---------- Marking and sending changes ---------- */
+  function syncTouch(id) {
+    if (!online() || !canEditCases()) return;
+    delete sync.skip[id];
+    sync.dirty[id] = 1;
+    saveSync();
+    syncSoon();
+  }
+  function syncForget(id) {
+    if (!online() || !canEditCases()) return;
+    delete sync.dirty[id];
+    delete sync.skip[id];
+    if (sync.meta[id]) { sync.del[id] = sync.meta[id].v; delete sync.meta[id]; }
+    saveSync();
+    syncSoon();
+  }
+  function syncSoon() {
+    clearTimeout(net.timer);
+    renderSync();
+    net.timer = setTimeout(function () { syncNow(false); }, 1200);
+  }
+  function setOffline(off) { net.offline = off; renderSync(); }
+  function syncNow(force) {
+    if (!online() || net.modal) return Promise.resolve();
+    return pushAll().then(function () {
+      if (force || Date.now() - net.lastPull > 20000) return pullAll();
+    });
+  }
+  function pushAll() {
+    if (net.pushing || !online() || !canEditCases()) return Promise.resolve();
+    net.pushing = true;
+    renderSync();
+    var dels = Object.keys(sync.del), ids = Object.keys(sync.dirty);
+    var run = Promise.resolve();
+    dels.forEach(function (id) {
+      run = run.then(function () {
+        return authed({ action:'mp_del', id:id, v:sync.del[id] }).then(function (o) {
+          if (o.ok || o.error === 'not_found') { delete sync.del[id]; saveSync(); setOffline(false); net.lastOk = Date.now(); }
+          else if (o.error === 'conflict') { delete sync.del[id]; saveSync(); }
+        });
+      });
+    });
+    ids.forEach(function (id) {
+      run = run.then(function () {
+        var c = store.cases[id];
+        if (!sync.dirty[id] || net.modal) return;
+        if (!c || !hasContent(c)) { delete sync.dirty[id]; saveSync(); return; }
+        var before = JSON.stringify(c);
+        return authed({ action:'mp_save', id:id, v:(sync.meta[id] || {}).v || 0, data:c }).then(function (o) {
+          if (o.ok) {
+            sync.meta[id] = { v:o.v, by:o.by, at:o.at };
+            if (JSON.stringify(store.cases[id] || {}) === before) delete sync.dirty[id];
+            saveSync();
+            net.lastOk = Date.now();
+            setOffline(false);
+          } else if (o.error === 'conflict') {
+            net.queue.push({ kind:'edit', id:id, theirs:o.current || null });
+            nextConflict();
+          } else if (o.error === 'too_large') {
+            toast('เคส ' + caseName(c) + ' มีข้อมูลยาวเกินไป ยังส่งขึ้นระบบไม่ได้');
+          }
+        });
+      });
+    });
+    return run.catch(function (e) {
+      if (!(e && e.handled)) setOffline(true);
+    }).then(function () {
+      net.pushing = false;
+      renderSync();
+      if (view === 'cases') renderCases();
+    });
+  }
+  function pullAll() {
+    if (net.pulling || !online()) return Promise.resolve();
+    net.pulling = true;
+    return authed({ action:'mp_list' }).then(function (o) {
+      if (!o.ok) {
+        if (o.error === 'unknown_action') { net.mode = 'local'; toast('ระบบกลางยังไม่รองรับ Master Plan จึงเก็บเฉพาะเครื่องนี้ไปก่อน'); }
+        return;
+      }
+      net.lastPull = Date.now();
+      net.lastOk = Date.now();
+      setOffline(false);
+      applyServer(o.cases || []);
+    }).catch(function (e) {
+      if (!(e && e.handled)) setOffline(true);
+    }).then(function () {
+      net.pulling = false;
+      renderSync();
+    });
+  }
+  function editingNow() {
+    var a = document.activeElement;
+    return view === 'plan' && a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA') && form.contains(a);
+  }
+  function applyServer(rows) {
+    var seen = {}, changedCurrent = false, keepEdit = editingNow() || !!pk;
+    rows.forEach(function (r) {
+      seen[r.id] = 1;
+      var meta = sync.meta[r.id];
+      if (sync.dirty[r.id] || sync.del[r.id] !== undefined) return;
+      if (meta && meta.v === r.v && store.cases[r.id]) return;
+      var raw;
+      try { raw = JSON.parse(r.data); } catch (e) { return; }
+      if (store.cases[r.id] === state && keepEdit) return; /* picked up by the next pull */
+      var n = normalize(raw);
+      n.id = r.id;
+      if (store.cases[r.id] === state) { state = n; changedCurrent = true; }
+      store.cases[r.id] = n;
+      sync.meta[r.id] = { v:r.v, by:r.by, at:r.at };
+    });
+    /* gone from the server: deleted on another computer */
+    Object.keys(sync.meta).forEach(function (id) {
+      if (seen[id] || sync.dirty[id]) return;
+      if (store.cases[id] === state) {
+        if (keepEdit) return;
+        state = blank();
+        store.cases[state.id] = state;
+        changedCurrent = true;
+      }
+      delete store.cases[id];
+      delete sync.meta[id];
+      delete expanded[id];
+    });
+    /* cases only on this browser: the same project on the server is a choice, the rest may be sent */
+    var byNo = {};
+    rows.forEach(function (r) {
+      try { var no = String(JSON.parse(r.data).project.projectNo || '').trim().toLowerCase(); if (no) byNo[no] = r; } catch (e) { /* skip */ }
+    });
+    var localOnly = [];
+    caseList().forEach(function (c) {
+      if (sync.meta[c.id] || sync.skip[c.id]) return;
+      var no = c.project.projectNo.trim().toLowerCase();
+      if (no && byNo[no]) {
+        if (!net.queue.some(function (q) { return q.id === c.id; })) net.queue.push({ kind:'dup', id:c.id, theirs:byNo[no] });
+        delete sync.dirty[c.id];
+      } else if (!sync.dirty[c.id] && canEditCases()) localOnly.push(c);
+    });
+    saveSync();
+    writeStore();
+    if (changedCurrent) fillForm();
+    refresh();
+    refreshView();
+    if (net.queue.length) nextConflict();
+    else if (localOnly.length && !net.offered) offerUpload(localOnly);
+  }
+
+  /* ---------- Choices the person has to make ---------- */
+  function modal(html) {
+    var m = $('mpModal');
+    m.innerHTML = '<div class="mp-box" role="dialog" aria-modal="true">' + html + '</div>';
+    m.hidden = false;
+    net.modal = true;
+    var f = m.querySelector('button');
+    if (f) f.focus();
+  }
+  function closeModal() { var m = $('mpModal'); m.hidden = true; m.innerHTML = ''; net.modal = false; }
+  function offerUpload(list) {
+    net.offered = true;
+    var items = list.slice(0, 8).map(function (c) { return '<li>' + esc(caseName(c)) + '</li>'; }).join('');
+    modal('<h2>ส่งเคสในเครื่องนี้ขึ้นระบบกลางไหม?</h2><p>พบ ' + list.length + ' เคสที่อยู่เฉพาะในเครื่องนี้ ถ้าส่งขึ้นระบบ ผู้มีสิทธิ์ Master Plan ทุกคนจะเห็นเคสเหล่านี้</p><ul>' + items + (list.length > 8 ? '<li>และอีก ' + (list.length - 8) + ' เคส</li>' : '') + '</ul>' +
+      '<div class="mp-row"><button type="button" class="btn primary" data-mp="send">ส่งขึ้นระบบกลาง</button><button type="button" class="btn" data-mp="keep">ยังไม่ส่ง</button></div>');
+    net.modalList = list.map(function (c) { return c.id; });
+  }
+  function nextConflict() {
+    if (net.modal || !net.queue.length) return;
+    var q = net.queue[0], mine = store.cases[q.id];
+    if (!mine) { net.queue.shift(); nextConflict(); return; }
+    var who = q.theirs ? esc(q.theirs.by || 'ผู้ใช้อื่น') + (q.theirs.at ? ' เมื่อ ' + esc(atText(q.theirs.at)) : '') : '';
+    var title, body, useTheirs = 'ใช้ของในระบบกลาง', useMine = 'ใช้ของเครื่องนี้';
+    if (q.kind === 'dup') {
+      title = 'มีเคสนี้อยู่ในระบบกลางแล้ว';
+      body = 'เคส <b>' + esc(caseName(mine)) + '</b> ในเครื่องนี้มี Project No. ตรงกับเคสในระบบกลาง ที่แก้ล่าสุดโดย ' + who + ' กรุณาเลือกว่าจะเก็บฉบับไหน';
+    } else if (!q.theirs || q.theirs.del) {
+      title = 'เคสนี้ถูกลบจากระบบกลางแล้ว';
+      body = 'เคส <b>' + esc(caseName(mine)) + '</b> ถูกลบจากระบบกลาง' + (who ? 'โดย ' + who : '') + ' แต่เครื่องนี้มีการแก้ไขที่ยังไม่ได้ส่ง';
+      useTheirs = 'ลบตามระบบกลาง'; useMine = 'กู้คืนด้วยของเครื่องนี้';
+    } else {
+      title = 'มีคนแก้เคสนี้พร้อมกัน';
+      body = 'เคส <b>' + esc(caseName(mine)) + '</b> ถูกแก้โดย ' + who + ' ระหว่างที่เครื่องนี้ยังไม่ได้ส่ง กรุณาเลือกฉบับที่จะเก็บ อีกฉบับหนึ่งจะถูกแทนที่';
+    }
+    modal('<h2>' + title + '</h2><p>' + body + '</p><div class="mp-row"><button type="button" class="btn primary" data-mp="theirs">' + useTheirs + '</button><button type="button" class="btn" data-mp="mine">' + useMine + '</button></div>');
+  }
+  function resolveConflict(choice) {
+    var q = net.queue.shift(), mine = store.cases[q.id], t = q.theirs;
+    closeModal();
+    if (choice === 'theirs') {
+      var parsed = null;
+      if (t && !t.del) { try { parsed = normalize(JSON.parse(t.data)); } catch (e) { parsed = null; } }
+      if (parsed) {
+        parsed.id = t.id;
+        if (q.kind === 'dup') delete store.cases[q.id];
+        if (state === mine) state = parsed;
+        store.cases[t.id] = parsed;
+        sync.meta[t.id] = { v:t.v, by:t.by, at:t.at };
+      } else {
+        delete store.cases[q.id];
+        delete sync.meta[q.id];
+        if (state === mine) { state = blank(); store.cases[state.id] = state; }
+      }
+      delete sync.dirty[q.id];
+    } else if (q.kind === 'dup') {
+      var keep = normalize(JSON.parse(JSON.stringify(mine)));
+      keep.id = t.id;
+      delete store.cases[q.id];
+      delete sync.dirty[q.id];
+      if (state === mine) state = keep;
+      store.cases[t.id] = keep;
+      sync.meta[t.id] = { v:t.v, by:t.by, at:t.at };
+      sync.dirty[t.id] = 1;
+    } else {
+      sync.meta[q.id] = { v:t ? t.v : 0, by:t ? t.by : '', at:t ? t.at : '' };
+      sync.dirty[q.id] = 1;
+    }
+    saveSync();
+    writeStore();
+    fillForm();
+    refresh();
+    refreshView();
+    if (net.queue.length) nextConflict();
+    else syncNow(true);
+  }
+  $('mpModal').addEventListener('click', function (e) {
+    var a = e.target.dataset && e.target.dataset.mp;
+    if (!a) return;
+    if (a === 'send') {
+      (net.modalList || []).forEach(function (id) { sync.dirty[id] = 1; });
+      closeModal(); saveSync(); syncNow(true);
+    } else if (a === 'keep') {
+      (net.modalList || []).forEach(function (id) { sync.skip[id] = 1; });
+      closeModal(); saveSync(); renderSync(); refreshView();
+    } else resolveConflict(a);
+  });
+  function atText(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.getDate() + ' ' + MON[d.getMonth()] + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  function caseMetaText(id) {
+    var m = sync.meta[id];
+    if (online() && !m && !sync.dirty[id]) return 'อยู่เฉพาะเครื่องนี้ ยังไม่ได้ส่งขึ้นระบบกลาง';
+    return m && m.by ? 'แก้ล่าสุดโดย ' + m.by + ' · ' + atText(m.at) : '';
+  }
+
+  /* ---------- What the page shows about all this ---------- */
+  function pendingCount() { return Object.keys(sync.dirty).length + Object.keys(sync.del).length; }
+  function syncText() {
+    if (net.mode === 'local' || demo) return '';
+    if (net.offline) return 'ออฟไลน์' + (pendingCount() ? ' · รอส่ง ' + pendingCount() + ' รายการ' : '');
+    if (pendingCount() || net.pushing) return 'กำลังบันทึกขึ้นระบบกลาง…';
+    return net.lastOk ? 'ซิงก์แล้ว ' + pad(new Date(net.lastOk).getHours()) + ':' + pad(new Date(net.lastOk).getMinutes()) : 'กำลังเชื่อมต่อ…';
+  }
+  function renderSync() {
+    var chip = $('syncChip'), isOn = net.mode === 'online' && session && !demo;
+    chip.hidden = !isOn;
+    if (isOn) {
+      var name = (session.me && session.me.name) || session.u;
+      $('syncStatus').textContent = syncText();
+      $('syncStatus').className = 'sync-status' + (net.offline ? ' off' : pendingCount() ? ' busy' : ' ok');
+      $('syncUser').textContent = name;
+      $('syncUser').title = name;
+    }
+    var localBanner = $('localBar');
+    localBanner.hidden = !(net.mode === 'local' && net.hello && net.hello.mp && !demo);
+    document.body.classList.toggle('readonly', online() && !canEditCases());
+    applyPrivacy();
+    applyReadOnly();
+    if (typeof renderBar === 'function') renderBar();
+  }
+  function privacyText() {
+    return online() ? 'ข้อมูลเก็บในระบบกลางของ GCC เข้าถึงได้เฉพาะบัญชีที่มีสิทธิ์ Master Plan' : 'ข้อมูลที่กรอกเก็บไว้ในเบราว์เซอร์ของเครื่องนี้เท่านั้น ไม่ถูกส่งขึ้นอินเทอร์เน็ต';
+  }
+  function applyPrivacy() { var p = $('privacyText'); if (p) p.textContent = privacyText(); }
+  function applyReadOnly() {
+    var ro = online() && !canEditCases();
+    form.querySelectorAll('input[data-path],textarea[data-path],.date-btn,.chip').forEach(function (el) { el.disabled = ro; });
+    var d = $('btnDraft'); if (d) d.disabled = ro;
+    ['btnNew', 'btnOpen'].forEach(function (b) { $(b).hidden = ro; });
+  }
+  function refreshView() { if (view === 'cases') renderCases(); else { renderBar(); } }
+
+  /* ---------- When to talk to the script ---------- */
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) syncNow(false); });
+  window.addEventListener('focus', function () { syncNow(false); });
+  window.addEventListener('online', function () { syncNow(true); });
+  setInterval(function () { if (!document.hidden) syncNow(true); }, 90000);
+  /* another tab of this browser saved: take its cases unless this one has unsent work */
+  window.addEventListener('storage', function (e) {
+    if (e.key === SYNC_KEY) loadSync();
+    if (e.key !== CASES_KEY || demo || editingNow() || pk) return;
+    var cur = state.id, fresh = { currentId:null, cases:{} };
+    try {
+      var d = JSON.parse(e.newValue || '{}');
+      Object.keys(d.cases || {}).forEach(function (k) { var n = normalize(d.cases[k]); n.id = k; fresh.cases[k] = n; });
+    } catch (err) { return; }
+    store = fresh;
+    state = store.cases[cur] || state;
+    store.cases[state.id] = state;
+    fillForm(); refresh(); refreshView();
+  });
+  $('syncLogout').addEventListener('click', doLogout);
+  $('localLogin').addEventListener('click', function () {
+    try { sessionStorage.removeItem(LOCAL_ONLY_KEY); } catch (e) { /* ignore */ }
+    net.mode = 'auth';
+    showAuth();
+    renderSync();
+  });
+  function syncBoot() {
+    loadSync();
+    session = loadSession();
+    if (session) { net.mode = 'online'; startOnline(); }
+    /* a script without Master Plan support leaves the page exactly as it was: this browser only */
+    post({ action:'hello' }).then(function (h) {
+      if (!h || !h.ok) return;
+      net.hello = h;
+      if (!h.mp) {
+        if (net.mode === 'online') net.mode = 'local';
+        renderSync();
+        return;
+      }
+      if (net.mode !== 'online' && !session && !demo) {
+        var localOnly = false;
+        try { localOnly = sessionStorage.getItem(LOCAL_ONLY_KEY) === '1'; } catch (e) { /* no */ }
+        if (localOnly) { net.mode = 'local'; renderSync(); }
+        else { net.mode = 'auth'; showAuth(); renderSync(); }
+      }
+    }).catch(function () { renderSync(); });
+  }
+
   /* ---------- Start ---------- */
   buildSchedule();
   buildYearChips();
@@ -2114,6 +2701,8 @@ button.g-bar{cursor:pointer}
   else showView(location.hash === '#plan' || !caseList().length ? 'plan' : location.hash === '#cases' || caseList().length ? 'cases' : 'plan');
   if (window.ResizeObserver) new ResizeObserver(fitPreview).observe(stage);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
+  renderSync();
+  syncBoot();
 })();
 </script>
 </body>
