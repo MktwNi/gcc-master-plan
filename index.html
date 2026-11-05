@@ -270,7 +270,7 @@ body[data-view=plan] #btnBackup,body[data-view=cases] #btnSave{display:none}
 /* ---------- Overview ---------- */
 #casesView{flex:1;max-width:none;padding:0;background:#fff}
 body[data-view=cases] #btnNew{display:none}
-body.readonly .ov-title-r .btn{display:none}
+body.readonly .ov-title-r .btn,body.readonly .gt-close{display:none!important}
 .ov-wrap{max-width:1360px;margin:0 auto;padding:0 24px}
 .ov-sub{background:#fff;border-bottom:1px solid var(--line)}
 .ov-sub-in{display:flex;align-items:center;gap:8px 20px;min-height:56px}
@@ -373,6 +373,10 @@ button.g-nodate:hover{text-decoration:underline}
 .gt-actions{display:flex;flex-wrap:wrap;gap:4px 12px;padding:10px 2px 0}
 .gt-actions button{padding:2px 0;border:0;background:none;font-size:12.5px;font-weight:600;color:var(--brand-d);text-decoration:underline}
 .gt-actions button.danger{color:var(--danger);font-weight:500}
+.gt-actions button.gt-close{display:inline-flex;align-items:center;gap:5px;min-height:28px;padding:1px 11px 1px 8px;border:1px solid var(--line-2);border-radius:999px;background:#fff;color:var(--brand-d);text-decoration:none}
+.gt-actions button.gt-close .ic{width:14px;height:14px}
+.gt-actions button.gt-close:hover{background:var(--brand-soft);border-color:var(--brand)}
+#btnFinish .ic{width:17px;height:17px}
 .gt-empty{padding:24px 2px;color:var(--muted);font-size:14px}
 .gt-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;margin-left:calc(var(--lw) + var(--pw));padding-top:10px;font-size:12px;color:var(--muted)}
 .gt-foot span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
@@ -431,6 +435,7 @@ button.g-nodate:hover{text-decoration:underline}
   .gt-row.case{grid-template-columns:minmax(0,1fr)}
   .gt-card{position:relative;z-index:4;padding:0 0 8px}
   .gt-foot{margin-left:0}
+  .fin-more{display:none}
   .plan-bar .stepper{margin:0;flex-wrap:wrap}
   .view-tabs{order:3;width:100%;margin:0}
   .view-tabs button{flex:1}
@@ -716,6 +721,7 @@ body.readonly .fu-done,body.readonly .gt-actions .danger,body.readonly #draftCar
   <div class="inner">
     <button type="button" class="btn" id="btnBack"><svg class="ic"><use href="#i-left"/></svg>ย้อนกลับ</button>
     <span class="bar-info" id="barInfo"></span>
+    <button type="button" class="btn" id="btnFinish" hidden><svg class="ic"><use href="#i-check"/></svg>เสร็จสิ้น<span class="fin-more">กลับภาพรวม</span></button>
     <button type="button" class="btn primary" id="btnNext"></button>
   </div>
 </div>
@@ -1269,10 +1275,11 @@ body.readonly .fu-done,body.readonly .gt-actions .danger,body.readonly #draftCar
   function renderBar() {
     var next = $('btnNext'), info = $('barInfo');
     $('btnBack').style.visibility = step === 1 ? 'hidden' : 'visible';
+    $('btnFinish').hidden = step !== 3;
     if (step === 1) next.innerHTML = 'ถัดไป: วางแผนงาน' + ic('right');
     else if (step === 2) next.innerHTML = 'ถัดไป: ตรวจและออก PDF' + ic('right');
     else next.innerHTML = ic('pdf') + 'ออก PDF';
-    info.textContent = online() ? syncText() : saveEl.textContent ? saveEl.textContent + (dirty ? ' · ยังไม่ได้บันทึกเป็นไฟล์' : '') : '';
+    info.textContent = online() ? syncText().replace('ซิงก์แล้ว', 'บันทึกขึ้นระบบกลางแล้ว') : saveEl.textContent ? saveEl.textContent + (dirty ? ' · ยังไม่ได้บันทึกเป็นไฟล์' : '') : '';
   }
   function goTo(path) {
     if (view !== 'plan') showView('plan');
@@ -1711,8 +1718,8 @@ body.readonly .fu-done,body.readonly .gt-actions .danger,body.readonly #draftCar
       if (d < 0) info.overdue.push(row);
       else if (!info.next || e < info.next.due) info.next = row;
     });
-    info.state = info.dated === 0 ? 'none'
-      : info.done === ALL.length ? 'closed'
+    info.state = info.done === ALL.length ? 'closed'
+      : info.dated === 0 ? 'none'
       : info.overdue.length ? 'late'
       : (info.next && info.next.days <= 7) ? 'soon' : 'ok';
     return info;
@@ -1938,8 +1945,10 @@ body.readonly .fu-done,body.readonly .gt-actions .danger,body.readonly #draftCar
         '<span class="gt-name">' + esc(shortName(full)) + '</span>' + ic('next') +
         '<span class="gt-meta"><span class="gt-pno">' + esc(c.project.projectNo) + '</span>' + stateHtml(i) + '</span>' +
         (isLocal ? '<span class="gt-local">เฉพาะเครื่องนี้</span>' : '') + '</button>';
+    var closeBtn = i.done < ALL.length ? '<button type="button" class="gt-close" data-close="' + esc(c.id) + '" title="เปลี่ยนกิจกรรมที่ยังไม่เสร็จทั้งหมดเป็น Done">' + ic('check') + 'ปิดเคส</button>' : '';
+    if (!open && !one && closeBtn) h += '<div class="gt-actions">' + closeBtn + '</div>';
     if (open) {
-      h += '<div class="gt-actions"><button type="button" data-open="' + esc(c.id) + '">เปิดแผนนี้</button>' +
+      h += '<div class="gt-actions">' + closeBtn + '<button type="button" data-open="' + esc(c.id) + '">เปิดแผนนี้</button>' +
         '<button type="button" data-savefile="' + esc(c.id) + '">บันทึกไฟล์แผน</button>' +
         '<button type="button" class="danger" data-del="' + esc(c.id) + '">ลบเคสนี้</button>' +
         (caseMetaText(c.id) ? '<span class="gt-meta-line">' + esc(caseMetaText(c.id)) + '</span>' : '') + '</div>';
@@ -2019,16 +2028,30 @@ body.readonly .fu-done,body.readonly .gt-actions .danger,body.readonly #draftCar
     if (!canEditCases()) return;
     var c = store.cases[id], a = c.activities[row], prev = a.status;
     a.status = 'Done';
-    writeStore();
-    syncTouch(id);
-    if (c === state) refresh();
-    renderCases();
+    statusChanged(c);
     toast('ทำเครื่องหมายเสร็จแล้ว: กิจกรรม ' + row + ' ของ ' + caseName(c), 'เลิกทำ', function () {
       a.status = prev;
-      writeStore();
-      syncTouch(id);
-      if (c === state) refresh();
-      renderCases();
+      statusChanged(c);
+    });
+  }
+  function statusChanged(c) {
+    writeStore();
+    syncTouch(c.id);
+    if (c === state) { fillForm(); refresh(); }
+    renderCases();
+  }
+  function closeCase(id) {
+    if (!canEditCases()) return;
+    var c = store.cases[id];
+    var rows = ALL.map(function (it) { return it[0]; }).filter(function (n) { return c.activities[n].status !== 'Done'; });
+    if (!rows.length) return;
+    if (!window.confirm('ปิดเคส ' + caseName(c) + ' หรือไม่? กิจกรรมที่ยังไม่เสร็จ ' + rows.length + ' ข้อจะเปลี่ยนเป็น Done')) return;
+    var before = rows.map(function (n) { return c.activities[n].status; });
+    rows.forEach(function (n) { c.activities[n].status = 'Done'; });
+    statusChanged(c);
+    toast('ปิดเคส ' + caseName(c) + ' แล้ว ดูได้จากช่องแสดงเคสที่ปิดแล้ว', 'เลิกทำ', function () {
+      rows.forEach(function (n, k) { c.activities[n].status = before[k]; });
+      statusChanged(c);
     });
   }
   function deleteCase(id) {
@@ -2183,6 +2206,16 @@ body.readonly .fu-done,body.readonly .gt-actions .danger,body.readonly #draftCar
     if (v === 'cases') { renderCases(); window.scrollTo(0, 0); }
     else { fitPreview(); renderBar(); }
   }
+  $('btnFinish').addEventListener('click', function () {
+    var c = state, named = hasContent(c);
+    if (online()) syncNow(false);
+    showView('cases');
+    if (!named || demo) return;
+    if (!online()) toast('บันทึก ' + caseName(c) + ' ในเบราว์เซอร์เครื่องนี้แล้ว');
+    else if (net.offline) toast('บันทึก ' + caseName(c) + ' ในเครื่องนี้แล้ว จะส่งขึ้นระบบกลางเมื่อออนไลน์');
+    else if (pendingCount() || net.pushing) toast('บันทึก ' + caseName(c) + ' แล้ว กำลังส่งขึ้นระบบกลาง');
+    else toast('บันทึก ' + caseName(c) + ' ขึ้นระบบกลางแล้ว');
+  });
   document.querySelector('.view-tabs').addEventListener('click', function (e) {
     var b = e.target.closest('[data-view]');
     if (b) showView(b.dataset.view);
@@ -2192,6 +2225,7 @@ body.readonly .fu-done,body.readonly .gt-actions .danger,body.readonly #draftCar
     if (!t) return;
     var d = t.dataset;
     if (d.done) { markDone(d.done, +d.row); return; }
+    if (d.close) { closeCase(d.close); return; }
     if (d.toggle) { expanded[d.toggle] = !expanded[d.toggle]; renderCases(); return; }
     if (d.open) { openCase(d.open, d.row ? +d.row : 0); return; }
     if (d.del) { deleteCase(d.del); return; }
