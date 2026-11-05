@@ -636,19 +636,10 @@ input::placeholder,textarea::placeholder{color:#7c8a83}
     return '<div class="run-foot">Project Master Plan (CFO Verification) &nbsp;·&nbsp; ' + esc(rd) +
            ' &nbsp;·&nbsp; Confidential — for the named client only</div>';
   }
-  function dayCell(k, i0, i1, first, last, colW, numPt) {
+  function dayCell(k, i0, i1, last, numPt) {
     if (k < i0 || k > i1) return '<td></td>';
-    var txt = '', size = numPt;
-    if (i0 === i1) {
-      if (first.d === last.d) { txt = String(first.d); }
-      else if (colW < 13) { txt = first.d + '<br>' + last.d; }
-      else {
-        txt = first.d + '–' + last.d;
-        size = Math.min(numPt, colW * 0.92 / (txt.length * 0.56)); /* shrink only as much as the cell needs */
-      }
-    } else if (k === i0) { txt = String(first.d); }
-    else if (k === i1) { txt = String(last.d); }
-    return '<td class="on" style="font-size:' + size.toFixed(2) + 'pt">' + txt + '</td>';
+    /* Only the last day is printed; the shading shows the rest of the period. */
+    return '<td class="on" style="font-size:' + numPt.toFixed(2) + 'pt">' + (k === i1 ? last.d : '') + '</td>';
   }
   function ganttHtml() {
     var tl = timeline(), n = tl.months * 4;
@@ -677,7 +668,7 @@ input::placeholder,textarea::placeholder{color:#7c8a83}
           i1 = Math.floor((dayNum(sp.last) - tl.baseDay) / 7);
         }
         for (var k = 0; k < n; k++) {
-          h += sp ? dayCell(k, i0, i1, sp.first, sp.last, colW, numPt) : '<td></td>';
+          h += sp ? dayCell(k, i0, i1, sp.last, numPt) : '<td></td>';
         }
         h += '</tr>';
       });
@@ -718,7 +709,7 @@ input::placeholder,textarea::placeholder{color:#7c8a83}
           '<span><i style="background:#e9eeea"></i>Project phase</span>' +
         '</div></div>' +
         '<p class="remark"><b>Remark:</b> &nbsp;Activities no. 9 – 16 may shift depending on the time required for client correspondence and closure of findings.<br>' +
-        'Shaded cells show the planned period of each activity; the numbers indicate its start and end calendar dates.<br>' +
+        'Shaded cells show the planned period of each activity; the number indicates its end calendar date.<br>' +
         'Each week column covers 7 consecutive days counted from ' + esc(timeline().baseLabel) + ', so a date near a month end may appear under the next month’s heading.</p>' +
       '</div>' + runningFoot() + '</div>';
     var s = state.signoff;
